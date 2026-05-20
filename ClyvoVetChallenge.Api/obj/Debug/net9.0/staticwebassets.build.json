@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "QC+F1BIo0espExgRssKlnUk/RKaLvnPgHHzneTYINvg=",
+  "Source": "ClyvoVetChallenge.Api",
+  "BasePath": "_content/ClyvoVetChallenge.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

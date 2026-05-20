@@ -1,0 +1,17 @@
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\bin\Debug\net9.0\ClyvoVetChallenge.Application.deps.json
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\bin\Debug\net9.0\ClyvoVetChallenge.Application.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\bin\Debug\net9.0\ClyvoVetChallenge.Application.pdb
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\bin\Debug\net9.0\ClyvoVetChallenge.Domain.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\bin\Debug\net9.0\ClyvoVetChallenge.Infrastructure.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\bin\Debug\net9.0\ClyvoVetChallenge.Domain.pdb
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\bin\Debug\net9.0\ClyvoVetChallenge.Infrastructure.pdb
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVetChallenge.Application.csproj.AssemblyReference.cache
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVetChallenge.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVetChallenge.Application.AssemblyInfoInputs.cache
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVetChallenge.Application.AssemblyInfo.cs
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVetChallenge.Application.csproj.CoreCompileInputs.cache
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVet.98014F1B.Up2Date
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVetChallenge.Application.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\refint\ClyvoVetChallenge.Application.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ClyvoVetChallenge.Application.pdb
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Application\obj\Debug\net9.0\ref\ClyvoVetChallenge.Application.dll

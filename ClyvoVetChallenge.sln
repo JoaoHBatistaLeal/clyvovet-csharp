@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClyvoVetChallenge.Api", "ClyvoVetChallenge.Api\ClyvoVetChallenge.Api.csproj", "{FB372EC8-DB4A-4A8E-934A-27BD362EB01F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClyvoVetChallenge.Domain", "ClyvoVetChallenge.Domain\ClyvoVetChallenge.Domain.csproj", "{8F50F56B-D31E-4BDC-9E16-AEF07CE34227}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClyvoVetChallenge.Application", "ClyvoVetChallenge.Application\ClyvoVetChallenge.Application.csproj", "{12595581-C589-4D0E-8F45-B62E41BB1617}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClyvoVetChallenge.Infrastructure", "ClyvoVetChallenge.Infrastructure\ClyvoVetChallenge.Infrastructure.csproj", "{0F2DC374-3747-415D-8759-2AE1EF77A3B4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB372EC8-DB4A-4A8E-934A-27BD362EB01F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB372EC8-DB4A-4A8E-934A-27BD362EB01F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB372EC8-DB4A-4A8E-934A-27BD362EB01F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB372EC8-DB4A-4A8E-934A-27BD362EB01F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F50F56B-D31E-4BDC-9E16-AEF07CE34227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F50F56B-D31E-4BDC-9E16-AEF07CE34227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F50F56B-D31E-4BDC-9E16-AEF07CE34227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F50F56B-D31E-4BDC-9E16-AEF07CE34227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12595581-C589-4D0E-8F45-B62E41BB1617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12595581-C589-4D0E-8F45-B62E41BB1617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12595581-C589-4D0E-8F45-B62E41BB1617}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12595581-C589-4D0E-8F45-B62E41BB1617}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F2DC374-3747-415D-8759-2AE1EF77A3B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F2DC374-3747-415D-8759-2AE1EF77A3B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F2DC374-3747-415D-8759-2AE1EF77A3B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F2DC374-3747-415D-8759-2AE1EF77A3B4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

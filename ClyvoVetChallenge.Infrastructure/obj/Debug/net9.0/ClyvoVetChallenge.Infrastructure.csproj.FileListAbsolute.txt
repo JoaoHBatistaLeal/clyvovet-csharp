@@ -1,0 +1,15 @@
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\bin\Debug\net9.0\ClyvoVetChallenge.Infrastructure.deps.json
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\bin\Debug\net9.0\ClyvoVetChallenge.Infrastructure.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\bin\Debug\net9.0\ClyvoVetChallenge.Infrastructure.pdb
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\bin\Debug\net9.0\ClyvoVetChallenge.Domain.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\bin\Debug\net9.0\ClyvoVetChallenge.Domain.pdb
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVetChallenge.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVetChallenge.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVetChallenge.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVetChallenge.Infrastructure.AssemblyInfo.cs
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVetChallenge.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVet.FCC8BD11.Up2Date
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVetChallenge.Infrastructure.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\refint\ClyvoVetChallenge.Infrastructure.dll
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ClyvoVetChallenge.Infrastructure.pdb
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Infrastructure\obj\Debug\net9.0\ref\ClyvoVetChallenge.Infrastructure.dll

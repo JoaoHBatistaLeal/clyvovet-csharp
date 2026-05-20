@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>ClyvoVetChallenge</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ClyvoVetChallenge.Application\ClyvoVetChallenge.Application.csproj" />
+      <ProjectReference Include="..\ClyvoVetChallenge.Domain\ClyvoVetChallenge.Domain.csproj" />
+      <ProjectReference Include="..\ClyvoVetChallenge.Infrastructure\ClyvoVetChallenge.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>
