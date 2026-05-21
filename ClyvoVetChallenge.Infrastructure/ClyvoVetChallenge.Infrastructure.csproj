@@ -8,11 +8,11 @@
 
     <ItemGroup>
       <Folder Include="Migrations\" />
-      <Folder Include="Repositories\" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\ClyvoVetChallenge.Domain\ClyvoVetChallenge.Domain.csproj" />
+      <ProjectReference Include="..\ClyvoVetChallenge.Application\ClyvoVetChallenge.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>

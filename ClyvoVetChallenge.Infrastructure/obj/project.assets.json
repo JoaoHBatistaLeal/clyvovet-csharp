@@ -424,6 +424,19 @@
           "buildTransitive/net6.0/_._": {}
         }
       },
+      "ClyvoVetChallenge.Application/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "dependencies": {
+          "ClyvoVetChallenge.Domain": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/ClyvoVetChallenge.Application.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ClyvoVetChallenge.Application.dll": {}
+        }
+      },
       "ClyvoVetChallenge.Domain/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
@@ -1121,6 +1134,11 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "ClyvoVetChallenge.Application/1.0.0": {
+      "type": "project",
+      "path": "../ClyvoVetChallenge.Application/ClyvoVetChallenge.Application.csproj",
+      "msbuildProject": "../ClyvoVetChallenge.Application/ClyvoVetChallenge.Application.csproj"
+    },
     "ClyvoVetChallenge.Domain/1.0.0": {
       "type": "project",
       "path": "../ClyvoVetChallenge.Domain/ClyvoVetChallenge.Domain.csproj",
@@ -1129,6 +1147,7 @@
   },
   "projectFileDependencyGroups": {
     "net9.0": [
+      "ClyvoVetChallenge.Application >= 1.0.0",
       "ClyvoVetChallenge.Domain >= 1.0.0",
       "Microsoft.EntityFrameworkCore >= 9.0.0",
       "Oracle.EntityFrameworkCore >= 9.23.26100"
@@ -1166,6 +1185,9 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
+            "C:\\Users\\hojej\\RiderProjects\\ClyvoVetChallenge\\ClyvoVetChallenge.Application\\ClyvoVetChallenge.Application.csproj": {
+              "projectPath": "C:\\Users\\hojej\\RiderProjects\\ClyvoVetChallenge\\ClyvoVetChallenge.Application\\ClyvoVetChallenge.Application.csproj"
+            },
             "C:\\Users\\hojej\\RiderProjects\\ClyvoVetChallenge\\ClyvoVetChallenge.Domain\\ClyvoVetChallenge.Domain.csproj": {
               "projectPath": "C:\\Users\\hojej\\RiderProjects\\ClyvoVetChallenge\\ClyvoVetChallenge.Domain\\ClyvoVetChallenge.Domain.csproj"
             }

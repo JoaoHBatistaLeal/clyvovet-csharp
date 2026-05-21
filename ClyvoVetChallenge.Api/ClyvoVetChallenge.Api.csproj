@@ -5,16 +5,22 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>ClyvoVetChallenge</RootNamespace>
+        <OpenApiGenerateDocuments>false</OpenApiGenerateDocuments>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2"/>
+        <PackageReference Include="DotNetEnv" Version="3.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\ClyvoVetChallenge.Application\ClyvoVetChallenge.Application.csproj" />
-      <ProjectReference Include="..\ClyvoVetChallenge.Domain\ClyvoVetChallenge.Domain.csproj" />
-      <ProjectReference Include="..\ClyvoVetChallenge.Infrastructure\ClyvoVetChallenge.Infrastructure.csproj" />
+        <ProjectReference Include="..\ClyvoVetChallenge.Application\ClyvoVetChallenge.Application.csproj" />
+        <ProjectReference Include="..\ClyvoVetChallenge.Domain\ClyvoVetChallenge.Domain.csproj" />
+        <ProjectReference Include="..\ClyvoVetChallenge.Infrastructure\ClyvoVetChallenge.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

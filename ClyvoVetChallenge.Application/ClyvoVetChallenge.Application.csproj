@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\ClyvoVetChallenge.Domain\ClyvoVetChallenge.Domain.csproj" />
-      <ProjectReference Include="..\ClyvoVetChallenge.Infrastructure\ClyvoVetChallenge.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

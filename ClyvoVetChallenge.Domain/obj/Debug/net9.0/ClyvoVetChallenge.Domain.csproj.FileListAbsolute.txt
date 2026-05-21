@@ -5,6 +5,7 @@ C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debu
 C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debug\net9.0\ClyvoVetChallenge.Domain.AssemblyInfoInputs.cache
 C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debug\net9.0\ClyvoVetChallenge.Domain.AssemblyInfo.cs
 C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debug\net9.0\ClyvoVetChallenge.Domain.csproj.CoreCompileInputs.cache
+C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debug\net9.0\ClyvoVetChallenge.Domain.sourcelink.json
 C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debug\net9.0\ClyvoVetChallenge.Domain.dll
 C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debug\net9.0\refint\ClyvoVetChallenge.Domain.dll
 C:\Users\hojej\RiderProjects\ClyvoVetChallenge\ClyvoVetChallenge.Domain\obj\Debug\net9.0\ClyvoVetChallenge.Domain.pdb
