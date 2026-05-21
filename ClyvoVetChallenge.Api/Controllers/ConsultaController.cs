@@ -9,6 +9,9 @@ namespace ClyvoVetChallenge.Api.Controllers;
 [ApiController]
 public class ConsultaController(IConsultaService consultaService) : ControllerBase
 {
+    /// <summary>
+    /// Lista todas as consultas cadastradas.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAll()
@@ -16,6 +19,9 @@ public class ConsultaController(IConsultaService consultaService) : ControllerBa
         return Ok(consultaService.GetAll());
     }
 
+    /// <summary>
+    /// Busca uma consulta específica pelo seu identificador único.
+    /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -25,6 +31,9 @@ public class ConsultaController(IConsultaService consultaService) : ControllerBa
         return item is null ? NotFound() : Ok(item);
     }
 
+    /// <summary>
+    /// Busca todas as consultas vinculadas a um animal específico.
+    /// </summary>
     [HttpGet("animal/{animalId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetByAnimalId(Guid animalId)
@@ -32,6 +41,9 @@ public class ConsultaController(IConsultaService consultaService) : ControllerBa
         return Ok(consultaService.GetByAnimalId(animalId));
     }
 
+    /// <summary>
+    /// Registra uma nova consulta no sistema.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -41,6 +53,9 @@ public class ConsultaController(IConsultaService consultaService) : ControllerBa
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    /// <summary>
+    /// Atualiza o resultado ou parecer clínico de uma consulta existente.
+    /// </summary>
     [HttpPut("{id:guid}/resultado")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -50,6 +65,9 @@ public class ConsultaController(IConsultaService consultaService) : ControllerBa
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    /// <summary>
+    /// Remove uma consulta do sistema.
+    /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

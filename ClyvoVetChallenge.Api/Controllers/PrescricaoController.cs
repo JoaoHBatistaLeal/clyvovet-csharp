@@ -9,6 +9,9 @@ namespace ClyvoVetChallenge.Api.Controllers;
 [ApiController]
 public class PrescricaoController(IPrescricaoService prescricaoService) : ControllerBase
 {
+    /// <summary>
+    /// Lista todas as prescrições cadastradas.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAll()
@@ -16,6 +19,9 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
         return Ok(prescricaoService.GetAll());
     }
 
+    /// <summary>
+    /// Busca uma prescrição específica pelo seu identificador único.
+    /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -25,6 +31,9 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
         return item is null ? NotFound() : Ok(item);
     }
 
+    /// <summary>
+    /// Registra uma nova prescrição no sistema.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -34,6 +43,9 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    /// <summary>
+    /// Atualiza uma prescrição existente.
+    /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,6 +55,9 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    /// <summary>
+    /// Remove uma prescrição do sistema.
+    /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ClyvoVetChallenge.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5bf7907625a66d292713537ff2cf4d4c5bf65ff9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e69fb35fd09f8701e5c6ad11508718c67bf61d87")]
 [assembly: System.Reflection.AssemblyProductAttribute("ClyvoVetChallenge.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ClyvoVetChallenge.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

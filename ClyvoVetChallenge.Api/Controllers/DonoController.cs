@@ -9,6 +9,9 @@ namespace ClyvoVetChallenge.Api.Controllers;
 [ApiController]
 public class DonoController(IDonoService donoService) : ControllerBase
 {
+    /// <summary>
+    /// Lista todos os donos cadastrados.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAll()
@@ -16,6 +19,9 @@ public class DonoController(IDonoService donoService) : ControllerBase
         return Ok(donoService.GetAll());
     }
 
+    /// <summary>
+    /// Busca um dono específico pelo seu identificador único.
+    /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -25,6 +31,9 @@ public class DonoController(IDonoService donoService) : ControllerBase
         return item is null ? NotFound() : Ok(item);
     }
 
+    /// <summary>
+    /// Registra um novo dono no sistema.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -34,6 +43,9 @@ public class DonoController(IDonoService donoService) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    /// <summary>
+    /// Atualiza as informações de um dono existente.
+    /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,6 +55,9 @@ public class DonoController(IDonoService donoService) : ControllerBase
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    /// <summary>
+    /// Remove um dono do sistema.
+    /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

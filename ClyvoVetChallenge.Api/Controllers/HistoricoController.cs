@@ -9,6 +9,9 @@ namespace ClyvoVetChallenge.Api.Controllers;
 [ApiController]
 public class HistoricoController(IHistoricoService historicoService) : ControllerBase
 {
+    /// <summary>
+    /// Lista todos os históricos cadastrados.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAll()
@@ -16,6 +19,9 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
         return Ok(historicoService.GetAll());
     }
 
+    /// <summary>
+    /// Busca um histórico específico pelo seu identificador único.
+    /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -25,6 +31,9 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
         return item is null ? NotFound() : Ok(item);
     }
 
+    /// <summary>
+    /// Registra um novo histórico no sistema.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -34,6 +43,9 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    /// <summary>
+    /// Atualiza um histórico existente.
+    /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,6 +55,9 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    /// <summary>
+    /// Remove um histórico do sistema.
+    /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

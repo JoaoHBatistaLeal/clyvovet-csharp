@@ -9,6 +9,9 @@ namespace ClyvoVetChallenge.Api.Controllers;
 [ApiController]
 public class VeterinarioController(IVeterinarioService veterinarioService) : ControllerBase
 {
+    /// <summary>
+    /// Lista todos os veterinários cadastrados.
+    /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetAll()
@@ -16,6 +19,9 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
         return Ok(veterinarioService.GetAll());
     }
 
+    /// <summary>
+    /// Busca um veterinário específico pelo seu identificador único.
+    /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -25,6 +31,9 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
         return item is null ? NotFound() : Ok(item);
     }
 
+    /// <summary>
+    /// Registra um novo veterinário no sistema.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -34,6 +43,9 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
+    /// <summary>
+    /// Atualiza as informações de um veterinário existente.
+    /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,6 +55,9 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    /// <summary>
+    /// Remove um veterinário do sistema.
+    /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
