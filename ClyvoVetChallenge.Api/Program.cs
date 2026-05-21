@@ -1,6 +1,7 @@
 using ClyvoVetChallenge.Api.Extensions;
 using ClyvoVetChallenge.Api.Exceptions;
 using DotNetEnv;
+using System.Reflection;
 
 Env.TraversePath().Load();
 
@@ -10,7 +11,12 @@ builder.Services.AddDBContext(builder.Configuration);
 builder.Services.AddRepositories();
 builder.Services.AddServices();
 
-builder.Services.AddSwaggerCustom();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
