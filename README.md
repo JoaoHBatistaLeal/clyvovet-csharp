@@ -6,12 +6,32 @@ API RESTful desenvolvida em .net 9.0 para projeto em colaboração com a divisã
 Sistema completo com CRUD para:
 - Animais, Donos, Clínicas, Consultas, Prescrições, Históricos, Sintomas e Veterinários.
 
-## Rotas Principais
+## Endpoints
+
+para o funcionamento correto é preciso que mude {entidade} pelo nome de alguma entidade Ex.: Veterinarios, Donos, Animais
+
 - `GET /api/{entidade}`: Lista todos os recursos.
 - `GET /api/{entidade}/{id}`: Busca recurso específico.
 - `POST /api/{entidade}`: Cria novo recurso.
 - `PUT /api/{entidade}/{id}`: Atualiza recurso existente.
 - `DELETE /api/{entidade}/{id}`: Remove recurso.
+
+*(Nota: Algumas entidades possuem rotas específicas, como `GET /api/Consulta/animal/{animalId}` e `PUT /api/Consulta/{id}/resultado`).*
+
+### Exemplo de Payload (POST /api/Animal)
+```json
+{
+  "nome": "Rex",
+  "especie": "Canina",
+  "raca": "Labrador",
+  "sexo": "M",
+  "dataNascimento": "2020-05-10",
+  "peso": 25.5,
+  "donoId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+}
+```
+
+
 
 ## Instalação e Execução
 1. clone o repositório 
