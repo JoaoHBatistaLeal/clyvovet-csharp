@@ -1,0 +1,27 @@
+﻿version: '3.8'
+
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe
+    container_name: oracle-db
+    environment:
+      - ORACLE_PASSWORD=${ORACLE_PASSWORD}
+    ports:
+      - "1521:1521"
+    volumes:
+      - oradata:/opt/oracle/oradata
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: clyvovet-api
+    ports:
+      - "8080:8080" 
+    depends_on:
+      - oracle-db
+    environment:
+      - DEV_ENV_DB=Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle-db)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XE)));User Id=system;Password=${ORACLE_PASSWORD}
+
+volumes:
+  oradata:
