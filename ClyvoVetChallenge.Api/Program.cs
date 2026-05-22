@@ -2,6 +2,8 @@ using ClyvoVetChallenge.Api.Extensions;
 using ClyvoVetChallenge.Api.Exceptions;
 using DotNetEnv;
 using System.Reflection;
+using ClyvoVetChallenge.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 Env.TraversePath().Load();
 
@@ -36,5 +38,20 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ClyvoVetContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocorreu um erro ao aplicar as migrations no banco de dados.");
+    }
+}
 
 app.Run();
