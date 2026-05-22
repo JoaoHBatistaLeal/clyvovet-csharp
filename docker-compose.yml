@@ -14,13 +14,14 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile 
+      dockerfile: Dockerfile
     container_name: clyvovet-api
     ports:
-      - "8080:8080" 
+      - "8080:8080"
     depends_on:
       - oracle-db
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
       - DEV_ENV_DB=Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle-db)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XE)));User Id=system;Password=${ORACLE_PASSWORD}
 
 volumes:
