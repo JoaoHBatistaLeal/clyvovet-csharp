@@ -8,7 +8,7 @@ Sistema completo com CRUD para:
 
 ## Endpoints
 
-para o funcionamento correto é preciso que mude {entidade} pelo nome de alguma entidade Ex.: Veterinarios, Donos, Animais
+para o funcionamento correto é preciso que mude `{entidade}` pelo nome de alguma entidade Ex.: `Veterinarios`, `Donos`, `Animais`
 
 - `GET /api/{entidade}`: Lista todos os recursos.
 - `GET /api/{entidade}/{id}`: Busca recurso específico.
