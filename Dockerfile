@@ -4,7 +4,7 @@ COPY . .
 RUN dotnet restore "ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj"
 RUN dotnet publish "ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 EXPOSE 8080
 COPY --from=build /app/publish .
