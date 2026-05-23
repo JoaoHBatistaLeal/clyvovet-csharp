@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ClyvoVetChallenge.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a76c823bd8ba34560977479a37e8c4a62e304684")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a70d6b2cc1d2e01c734d136552e0195e39e8898")]
 [assembly: System.Reflection.AssemblyProductAttribute("ClyvoVetChallenge.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ClyvoVetChallenge.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

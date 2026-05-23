@@ -42,15 +42,24 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    var context = services.GetRequiredService<ClyvoVetContext>();
+
+    int tentativas = 0;
+    bool migrado = false;
+
+    while (tentativas < 12 && !migrado)
     {
-        var context = services.GetRequiredService<ClyvoVetContext>();
-        context.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ocorreu um erro ao aplicar as migrations no banco de dados.");
+        try
+        {
+            context.Database.Migrate();
+            migrado = true;
+        }
+        catch (Exception)
+        {
+            tentativas++;
+            Thread.Sleep(15000);
+        }
     }
 }
 
