@@ -2,6 +2,12 @@
 
 API RESTful desenvolvida em .net 9.0 para projeto em colaboração com a divisão de medicina veterinária da empresa Clyvo
 
+Erik Naoki Miyasato RM: 565771
+Gustavo Arthur Carvalho Sartori RM: 561650
+Gutemberg Rocha Silva RM: 562267
+João Henrique Batista Leal RM: 564361
+Juliana da Silva Stigliani RM: 561171
+
 ## Funcionalidades
 Sistema completo com CRUD para:
 - Animais, Donos, Clínicas, Consultas, Prescrições, Históricos, Sintomas e Veterinários.
