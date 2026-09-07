@@ -1,188 +1,307 @@
 # Clyvo Vet API
 
-API RESTful desenvolvida em .net 9.0 para projeto em colaboração com a divisão de medicina veterinária da empresa Clyvo
+API RESTful desenvolvida em .NET 9.0 para projeto em colaboracao com a divisao de medicina veterinaria da empresa Clyvo.
 
-Erik Naoki Miyasato RM: 565771
-Gustavo Arthur Carvalho Sartori RM: 561650
-Gutemberg Rocha Silva RM: 562267
-João Henrique Batista Leal RM: 564361
-Juliana da Silva Stigliani RM: 561171
+## Integrantes da Equipe
+- Erik Naoki Miyasato - RM: 565771
+- Gustavo Arthur Carvalho Sartori - RM: 561650
+- Gutemberg Rocha Silva - RM: 562267
+- Joao Henrique Batista Leal - RM: 564361
+- Juliana da Silva Stigliani - RM: 561171
 
-## Funcionalidades
-Sistema completo com CRUD para:
-- Animais, Donos, Clínicas, Consultas, Prescrições, Históricos, Sintomas e Veterinários.
+---
 
-## Endpoints
+## Arquitetura da Solucao
 
-para o funcionamento correto é preciso que mude `{entidade}` pelo nome de alguma entidade Ex.: `Veterinarios`, `Donos`, `Animais`
+A solucao foi desenhada adotando principios de Domain-Driven Design (DDD), Clean Architecture e padrao de camadas:
 
-- `GET /api/{entidade}`: Lista todos os recursos.
-- `GET /api/{entidade}/{id}`: Busca recurso específico.
-- `POST /api/{entidade}`: Cria novo recurso.
-- `PUT /api/{entidade}/{id}`: Atualiza recurso existente.
-- `DELETE /api/{entidade}/{id}`: Remove recurso.
+- **ClyvoVetChallenge.Domain:** Entidades de dominio com encapsulamento, enums de status e regras fundamentais do negocio veterinario.
+- **ClyvoVetChallenge.Application:** DTOs de requisicao e resposta, contratos de interfaces de servicos e repositorios, validacoes de entrada e orquestracao das regras de aplicacao.
+- **ClyvoVetChallenge.Infrastructure:** Persistencia via Entity Framework Core com mapeamento Fluent API, suporte hibrido a SQLite e Oracle 19c, repositorios concretos e migrações versionadas.
+- **ClyvoVetChallenge.Api:** Camada de apresentacao RESTful com documentacao Swagger/OpenAPI, autenticacao JWT Bearer, tratamento global de erros no padrao RFC 9110 (ProblemDetails), logging estruturado Serilog, middleware de Correlation ID e instrumentacao OpenTelemetry.
+- **ClyvoVetChallenge.Tests.Unit:** 92 testes unitarios com xUnit e Moq para isolamento rigoroso de regras de negocio e servicos.
+- **ClyvoVetChallenge.Tests.Integration:** 28 testes de integracao com WebApplicationFactory validando o ciclo HTTP completo, autorizacao e codigos de status.
 
-*(Nota: Algumas entidades possuem rotas específicas, como `GET /api/Consulta/animal/{animalId}` e `PUT /api/Consulta/{id}/resultado`).*
+---
 
-### Exemplo de Payload (POST /api/Animal)
+## Catalogo Completo de Endpoints
+
+### 1. Autenticacao e Seguranca
+- `POST /api/Auth/login`: Autentica o usuario e retorna o token de acesso JWT.
+- `GET /api/Auth/perfil`: Retorna os dados do perfil autenticado (Requer `Authorization: Bearer <token>`).
+
+### 2. Animais (`/api/Animal`)
+- `GET /api/Animal`: Lista todos os animais cadastrados.
+- `GET /api/Animal/{id}`: Busca um animal especifico pelo ID.
+- `POST /api/Animal`: Cadastra um novo animal (Valida que a data de nascimento nao pode ser futura; retorna HTTP 422 em caso de violacao).
+- `PUT /api/Animal/{id}`: Atualiza os dados de um animal existente.
+- `DELETE /api/Animal/{id}`: Remove um animal do sistema.
+
+### 3. Clinicas Veterinarias (`/api/Clinica`)
+- `GET /api/Clinica`: Lista todas as clinicas cadastradas.
+- `GET /api/Clinica/{id}`: Busca uma clinica especifica pelo ID.
+- `POST /api/Clinica`: Cadastra uma nova clinica (validacao de CNPJ).
+- `PUT /api/Clinica/{id}`: Atualiza os dados de uma clinica existente.
+- `DELETE /api/Clinica/{id}`: Remove uma clinica do sistema.
+
+### 4. Consultas Veterinarias (`/api/Consulta`)
+- `GET /api/Consulta`: Lista todas as consultas cadastradas.
+- `GET /api/Consulta/{id}`: Busca uma consulta especifica pelo ID.
+- `GET /api/Consulta/animal/{animalId}`: Lista todas as consultas vinculadas a um animal.
+- `POST /api/Consulta`: Agenda uma nova consulta vinculando animal, veterinario e clinica.
+- `PUT /api/Consulta/{id}/resultado`: Registra diagnostico, observacoes e altera o status da consulta.
+- `DELETE /api/Consulta/{id}`: Cancela ou remove uma consulta do sistema.
+
+### 5. Diarios de Sintomas (`/api/Diario`)
+- `GET /api/Diario`: Lista todos os registros de diario cadastrados.
+- `GET /api/Diario/{id}`: Busca um registro de diario pelo ID.
+- `GET /api/Diario/animal/{animalId}`: Lista todos os diarios de um animal especifico.
+- `POST /api/Diario`: Cria um novo registro de diario de saude para o animal.
+- `PUT /api/Diario/{id}`: Atualiza anotacoes do diario.
+- `DELETE /api/Diario/{id}`: Remove um registro de diario.
+- `POST /api/Diario/{diarioId}/sintomas`: Adiciona um sintoma observado com nivel de intensidade ao diario.
+- `DELETE /api/Diario/{diarioId}/sintomas/{sintomaId}`: Remove um sintoma associado ao diario.
+
+### 6. Tutores / Donos (`/api/Dono`)
+- `GET /api/Dono`: Lista todos os donos cadastrados.
+- `GET /api/Dono/{id}`: Busca um dono especifico pelo ID.
+- `POST /api/Dono`: Cadastra um novo dono (validacao de CPF unico).
+- `PUT /api/Dono/{id}`: Atualiza informacoes de contato e endereco do dono.
+- `DELETE /api/Dono/{id}`: Remove um dono do sistema.
+
+### 7. Historicos Medicos (`/api/Historico`)
+- `GET /api/Historico`: Lista todos os eventos de historico medico.
+- `GET /api/Historico/{id}`: Busca um registro de historico pelo ID.
+- `GET /api/Historico/animal/{animalId}`: Lista os registros medicos de um animal especifico.
+- `POST /api/Historico`: Registra um novo evento historico para o animal.
+- `PUT /api/Historico/{id}`: Atualiza descricao e resultados do historico.
+- `DELETE /api/Historico/{id}`: Remove um evento historico.
+
+### 8. Prescricoes (`/api/Prescricao`)
+- `GET /api/Prescricao`: Lista todas as prescricoes cadastradas.
+- `GET /api/Prescricao/{id}`: Busca uma prescricao especifica pelo ID.
+- `GET /api/Prescricao/consulta/{consultaId}`: Lista prescricoes vinculadas a uma consulta.
+- `POST /api/Prescricao`: Emite uma nova prescricao com medicamento, dosagem e duracao.
+- `PUT /api/Prescricao/{id}`: Atualiza posologia e observacoes da prescricao.
+- `DELETE /api/Prescricao/{id}`: Remove uma prescricao.
+
+### 9. Catalogo de Sintomas (`/api/Sintoma`)
+- `GET /api/Sintoma`: Lista os tipos de sintomas pre-cadastrados.
+- `GET /api/Sintoma/{id}`: Busca um tipo de sintoma pelo ID.
+- `POST /api/Sintoma`: Cadastra um novo sintoma no catalogo.
+- `PUT /api/Sintoma/{id}`: Atualiza nome e descricao do sintoma.
+- `DELETE /api/Sintoma/{id}`: Remove um sintoma do catalogo.
+
+### 10. Medicos Veterinarios (`/api/Veterinario`)
+- `GET /api/Veterinario`: Lista todos os veterinarios cadastrados.
+- `GET /api/Veterinario/{id}`: Busca um veterinario especifico pelo ID.
+- `POST /api/Veterinario`: Cadastra um novo veterinario (validacao de CRMV).
+- `PUT /api/Veterinario/{id}/contato`: Atualiza dados de contato (telefone e email) do veterinario.
+- `DELETE /api/Veterinario/{id}`: Remove um veterinario do sistema.
+
+### 11. Monitoramento e Observabilidade
+- `GET /health`: Diagnostico abrangente da aplicacao com validacao do banco de dados e servicos externos.
+- `GET /health/ready`: Probe de prontidao (Readiness) filtrando dependencias essenciais.
+- `GET /health/live`: Probe de vivacidade (Liveness) leve para orquestradores.
+- `GET /metrics`: Metricas no formato Prometheus exportadas via OpenTelemetry.
+
+---
+
+## Exemplos de Payload
+
+### Autenticacao (`POST /api/Auth/login`)
 ```json
 {
-  "nome": "Rex",
-  "especie": "Canina",
-  "raca": "Labrador",
-  "sexo": "M",
-  "dataNascimento": "2020-05-10",
-  "peso": 25.5,
-  "donoId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  "usuario": "admin",
+  "senha": "password123"
 }
 ```
 
+### Cadastro de Animal (`POST /api/Animal`)
+```json
+{
+  "donoId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "nome": "Rex",
+  "especie": "Canina",
+  "raca": "Labrador",
+  "sexo": "Macho",
+  "dataNascimento": "2022-05-10",
+  "peso": 25.5
+}
+```
+
+### Agendamento de Consulta (`POST /api/Consulta`)
+```json
+{
+  "animalId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "veterinarioId": "4ba95f64-5717-4562-b3fc-2c963f66afa7",
+  "clinicaId": "5ca95f64-5717-4562-b3fc-2c963f66afa8",
+  "dataConsulta": "2026-08-10",
+  "horaConsulta": "14:00:00",
+  "motivo": "Vacinacao anual e revisao geral",
+  "tipo": "Presencial"
+}
+```
+
+### Atualizacao de Resultado da Consulta (`PUT /api/Consulta/{id}/resultado`)
+```json
+{
+  "diagnostico": "Animal saudavel, vacinas polivalente e antirrabica aplicadas",
+  "observacoes": "Retorno agendado para daqui a 12 meses",
+  "status": 2
+}
+```
+
+---
+
 ## Monitoramento e Observabilidade
 
-A API conta com recursos integrados de observabilidade, incluindo health checks customizados, métricas no formato Prometheus, rastreamento distribuído e logging estruturado.
+A API conta com recursos nativos e estruturados de observabilidade:
 
 ### Endpoints de Health Check
+- `GET /health`: Executa os testes de conectividade ativos contra o banco de dados (`AddDbContextCheck<ClyvoVetContext>`) e servicos externos. Retorna HTTP 200 (Healthy / Degraded) ou HTTP 503 (Unhealthy).
+- `GET /health/ready`: Probe de prontidao avaliando dependencias essenciais marcadas com tag `ready`.
+- `GET /health/live`: Probe de vivacidade leve para orquestradores (Kubernetes e Docker).
 
-- `GET /health`: Diagnóstico completo da saúde da aplicação, validando a conectividade com o banco de dados e a acessibilidade aos serviços externos dependentes. Retorna status HTTP 200 (Healthy ou Degraded) ou HTTP 503 (Unhealthy).
-- `GET /health/ready`: Probe de prontidão (readiness) para orquestradores e balanceadores, avaliando componentes essenciais marcados com a tag `ready` (banco de dados e serviços externos).
-- `GET /health/live`: Probe de vivacidade (liveness) leve, verificando se o processo da aplicação está ativo e respondendo a requisições sem validar dependências externas.
-
-#### Exemplo de Payload de Resposta (`/health`)
+#### Exemplo de Resposta do Health Check (`/health`)
 ```json
 {
   "status": "Healthy",
-  "totalDuration": "00:00:00.0451234",
-  "entries": [
+  "duration": "00:00:00.7297179",
+  "checks": [
     {
       "name": "database",
       "status": "Healthy",
       "description": null,
-      "duration": "00:00:00.0123456",
-      "tags": [
-        "db",
-        "ready"
-      ]
+      "duration": "00:00:00.0377955",
+      "error": null
     },
     {
       "name": "fiap-portal",
       "status": "Healthy",
       "description": null,
-      "duration": "00:00:00.0327890",
-      "tags": [
-        "external",
-        "ready"
-      ]
+      "duration": "00:00:00.7201480",
+      "error": null
     }
   ]
 }
 ```
 
-### Métricas Prometheus
+### Metricas Prometheus (`/metrics`)
+O endpoint `/metrics` expoe metricas no padrao Prometheus alimentadas pelo OpenTelemetry:
+- Metricas de runtime do .NET: contadores de Garbage Collection, thread pool, consumo de memoria e CPU.
+- Metricas HTTP do ASP.NET Core: duracao de requisicoes, requisicoes ativas e distribuicao de status HTTP.
+- Metricas de banco de dados via Entity Framework Core: comandos executados e latencia de conexao.
+- Metricas de requisicoes de clientes externos (`HttpClient`).
 
-- `GET /metrics`: Expõe métricas coletadas pelo OpenTelemetry no formato padrão do Prometheus para raspagem (scraping). Inclui:
-  - Métricas do runtime do .NET (uso de memória, contadores de GC, thread pool, contadores de CPU).
-  - Métricas de requisições HTTP do ASP.NET Core (latência de requisição, requisições em andamento, códigos de status retornados).
-  - Métricas de clientes HTTP externos (`HttpClient`).
-  - Métricas de comandos executados via Entity Framework Core.
+### Logging Estruturado (Serilog)
+- **Console:** Formatado com cores para inspecao agil em ambiente de desenvolvimento.
+- **Rolling File:** Gravacao persistente no caminho `logs/clyvovet-.log` com criacao de novos arquivos a cada dia e retencao automatica por 31 dias.
+- **Correlation ID:** O middleware customizado `CorrelationIdMiddleware` captura ou gera um `X-Correlation-Id`, propagando-o no cabecalho de resposta e no contexto estruturado de log (`LogContext`).
+- **Tratamento Global de Excecoes:** Centralizado via `GlobalExceptionHandler` retornando ProblemDetails padronizado (RFC 9110) com correlacao do `TraceId` ativo.
 
-### Logs Estruturados e Rastreabilidade
+---
 
-- **Serilog:** Pipeline estruturado com enriquecimento contextual.
-  - Saída no Console para desenvolvimento e visualização rápida em containers.
-  - Saída em arquivo com rotação diária (`Rolling File`) no caminho `logs/clyvovet-.log` com retenção configurada de 31 dias.
-- **Correlation ID:** O middleware `CorrelationIdMiddleware` captura ou gera automaticamente o cabeçalho `X-Correlation-Id` em cada requisição HTTP, propagando-o no cabeçalho de resposta e no contexto de log (`LogContext`).
-- **OpenTelemetry Tracing:** Rastreamento distribuído integrado com ASP.NET Core, chamadas HTTP externas e Entity Framework Core.
-- **Tratamento Global de Exceções:** Implementado via `GlobalExceptionHandler` seguindo a RFC 9110 (ProblemDetails), vinculando o `TraceId` ativo (`Activity.Current`) a cada erro não tratado retornado ao cliente.
+## Como Executar o Projeto
 
-## Autenticação e Autorização
+### Opcao 1: Execucao Local com SQLite (Recomendado para Desenvolvimento)
+Por padrao, no ambiente `Development`, a API esta configurada para utilizar SQLite local com auto-geracao de schema via `Database.EnsureCreated()`, nao necessitando de containers ou banco externo.
 
-A API utiliza autenticação baseada em tokens JWT (JSON Web Token):
+1. Restaure as dependencias e compile o projeto:
+```bash
+dotnet build
+```
 
-- `POST /api/auth/login`: Autentica o usuário e gera o token de acesso.
-- `GET /api/auth/perfil`: Endpoint protegido que requer o envio do header `Authorization: Bearer <token>`, retornando os dados do perfil autenticado.
-- A interface do Swagger UI conta com o botão `Authorize` configurado para aceitar o esquema `Bearer <token>`.
+2. Inicie a API com o perfil HTTP:
+```bash
+dotnet run --project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj --launch-profile http
+```
 
-## Guia de Execução de Testes
+3. Acesse os servicos:
+- **Swagger UI:** [http://localhost:5177/swagger](http://localhost:5177/swagger)
+- **Health Check:** [http://localhost:5177/health](http://localhost:5177/health)
+- **Metricas:** [http://localhost:5177/metrics](http://localhost:5177/metrics)
 
-O projeto conta com suíte automatizada de testes seguindo o padrão AAA (Arrange, Act, Assert) e a convenção estrita de nomenclatura `NomeDoMetodo_CenarioOuEstado_ResultadoEsperado`.
+---
+
+### Opcao 2: Execucao com Banco de Dados Oracle
+Para conectar em uma instancia Oracle Database:
+
+1. Altere em `ClyvoVetChallenge.Api/appsettings.Development.json` a chave `"Database": { "UseSqlite": false }`.
+2. Defina a connection string via variavel de ambiente ou arquivo `.env` na raiz:
+```bash
+DEV_ENV_DB="Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=XE)));User Id=system;Password=suasenha"
+```
+3. Execute o projeto normalmente:
+```bash
+dotnet run --project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj
+```
+
+---
+
+### Opcao 3: Execucao via Docker Compose
+O projeto conta com definicao pronta no `docker-compose.yml` contendo a API e o banco Oracle XE:
+
+```bash
+docker compose up --build
+```
+A API ficara acessivel na porta `8080`: [http://localhost:8080/swagger](http://localhost:8080/swagger).
+
+---
+
+## Guia de Execucao de Testes
+
+O projeto conta com suíte automatizada de testes seguindo o padrao AAA (Arrange, Act, Assert) e a convencao estrita de nomenclatura `NomeDoMetodo_CenarioOuEstado_ResultadoEsperado`.
 
 ### Estrutura dos Projetos de Teste
+- `ClyvoVetChallenge.Tests.Unit`: 92 testes unitarios cobrindo todas as entidades do dominio e servicos de aplicacao. O isolamento de dependencias e garantido via **Moq**, sem acesso a rede ou banco de dados real.
+- `ClyvoVetChallenge.Tests.Integration`: 28 testes de integracao cobrindo o ciclo HTTP completo com `WebApplicationFactory<Program>`, colecoes compartilhadas (`IntegrationTestCollection`) e banco SQLite isolado descartavel por bateria.
 
-- `ClyvoVetChallenge.Tests.Unit`: Testes unitários cobrindo entidades do domínio (`ClyvoVetChallenge.Domain`) e serviços de aplicação (`ClyvoVetChallenge.Application`), com total isolamento de dependências externas através do framework Moq.
-- `ClyvoVetChallenge.Tests.Integration`: Testes de integração cobrindo o ciclo de vida HTTP completo dos endpoints, autenticação JWT, validações e códigos de status (200, 201, 204, 400, 401, 404, 422) utilizando `WebApplicationFactory<Program>` e fixture compartilhada `[CollectionDefinition("IntegrationTests")]`.
+### Comandos de Teste
 
-### Pré-requisitos para Execução dos Testes
-
-- .NET 9.0 SDK instalado na máquina.
-- Não é necessária nenhuma conexão com banco de dados externo ou container Oracle em execução: os testes de integração utilizam SQLite isolado gerenciado automaticamente pela fixture de teste (`ClyvoVetWebApplicationFactory`), garantindo independência e repetibilidade.
-
-### Comandos de Execução
-
-Executar toda a suíte de testes da solução:
+Executar toda a suite de testes (120 testes):
 ```bash
 dotnet test
 ```
 
-Executar apenas os testes unitários:
+Executar apenas os testes unitarios:
 ```bash
 dotnet test ClyvoVetChallenge.Tests.Unit/ClyvoVetChallenge.Tests.Unit.csproj
 ```
 
-Executar apenas os testes de integração:
+Executar apenas os testes de integracao:
 ```bash
 dotnet test ClyvoVetChallenge.Tests.Integration/ClyvoVetChallenge.Tests.Integration.csproj
 ```
 
-Executar testes com relatório detalhado:
+Executar com saida detalhada:
 ```bash
 dotnet test --logger "console;verbosity=detailed"
 ```
 
-Executar testes com filtro por classe ou cenário:
+Executar filtrando por classe especifica:
 ```bash
-dotnet test --filter "FullyQualifiedName~AnimalApiTests"
+dotnet test --filter "FullyQualifiedName~ConsultaApiTests"
 ```
+
+---
 
 ## Changelog da Sprint 3
 
-A Sprint 3 introduziu melhorias substanciais focadas em observabilidade, confiabilidade, arquitetura e garantia de qualidade:
+1. **Observabilidade e Monitoramento:**
+   - Adicao de endpoints `/health`, `/health/ready` e `/health/live` com escritor customizado em JSON (`HealthCheckResponseWriter`).
+   - Verificacao ativa de conexao com banco de dados via `AddDbContextCheck<ClyvoVetContext>` e probe de URL externa.
+   - Instrumentacao OpenTelemetry com exposicao de metricas Prometheus em `/metrics`.
+   - Logging estruturado com Serilog (Console e Rolling File diário em `logs/clyvovet-.log`).
+   - Propagacao do cabecalho `X-Correlation-Id` via `CorrelationIdMiddleware`.
+   - Captura centralizada de erros com `GlobalExceptionHandler` seguindo a RFC 9110 com `TraceId`.
 
-1. **Camada de Observabilidade e Monitoramento:**
-   - Adição de endpoints de Health Check (`/health`, `/health/ready`, `/health/live`) com escritor customizado em JSON (`HealthCheckResponseWriter`).
-   - Verificação ativa da conectividade com o banco de dados via `AddDbContextCheck<ClyvoVetContext>` e verificação de URL externa.
-   - Integração com OpenTelemetry para métricas e rastreamento distribuído, expondo métricas via `/metrics` para coleta do Prometheus.
-   - Configuração do Serilog com sinks para Console e Rolling File diário em `logs/clyvovet-.log`.
-   - Criação do `CorrelationIdMiddleware` para propagação de `X-Correlation-Id` em requisições, respostas e logs estruturados.
-   - Criação do `GlobalExceptionHandler` para captura centralizada de exceções e resposta no padrão ProblemDetails com `TraceId`.
+2. **Seguranca e Autenticacao:**
+   - Implementacao de autenticacao JWT Bearer com `/api/auth/login` e `/api/auth/perfil`.
+   - Suporte a Bearer Authorization configurado no Swagger UI.
 
-2. **Segurança e Autenticação:**
-   - Implementação de autenticação JWT Bearer com o endpoint `/api/auth/login` e `/api/auth/perfil`.
-   - Configuração do Swagger com suporte a Bearer Authentication (`SecurityDefinition` e `SecurityRequirement`).
-
-3. **Suíte de Testes Automatizados:**
-   - Separação clara entre projetos de testes unitários (`ClyvoVetChallenge.Tests.Unit`) e testes de integração (`ClyvoVetChallenge.Tests.Integration`).
-   - 92 testes unitários cobrindo regras de negócio das entidades de domínio e fluxos dos serviços com Moq.
-   - 28 testes de integração validando o ciclo HTTP dos endpoints com `WebApplicationFactory<Program>`, autenticação, validação de regras de negócio (status 422 para datas futuras) e códigos de status HTTP 200, 201, 204, 400, 401, 404.
+3. **Garantia de Qualidade e Testes:**
+   - 92 testes unitarios cobrindo entidades de dominio e servicos de aplicacao com Moq.
+   - 28 testes de integracao cobrindo o ciclo HTTP com `WebApplicationFactory<Program>`, validando codigos 200, 201, 204, 400, 401, 404 e 422.
    - Total de 120 testes automatizados integrados e aprovados.
-
-## Instalação e Execução
-1. clone o repositório 
-```bash 
-git clone https://github.com/JoaoHBatistaLeal/clyvovet-csharp.git
-```
-2. abra o projeto na IDE de sua preferência
-
-3. crie um arquivo `.env` na raiz do projeto e adicione a seguinte variável:
-```
-DEV_ENV_DB="Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=<HOST.COM>)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=<SERVICO>)));User Id=<USER>;Password=<SENHA>"
-```
-4. no terminal da solução, rode os seguintes comandos:
-```dotnet 
-dotnet build
-dotnet run --project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj
-```
-5. abra o navegador e acesse a documentação via swagger ui
-```
-http://localhost:PORTA/swagger
-```
 
