@@ -1,4 +1,4 @@
-﻿using ClyvoVetChallenge.Application.Interfaces.Repositories;
+using ClyvoVetChallenge.Application.Interfaces.Repositories;
 using ClyvoVetChallenge.Application.Services.Implementations;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 using ClyvoVetChallenge.Infrastructure.Persistence;
@@ -44,12 +44,29 @@ public static class PersistenceExtensions
 
     public static IServiceCollection AddDBContext(this IServiceCollection services, IConfiguration configuration)
     {
+        var useSqlite = configuration.GetValue<bool>("Database:UseSqlite");
+        if (useSqlite)
+        {
+            var sqliteConnectionString = configuration.GetConnectionString("ClyvoVetSqlite")
+                ?? "Data Source=clyvovet-dev.db";
+
+            services.AddDbContext<ClyvoVetContext>(options =>
+                options.UseSqlite(sqliteConnectionString));
+
+            return services;
+        }
+
+        var connectionString = Environment.GetEnvironmentVariable("DEV_ENV_DB")
+            ?? configuration.GetConnectionString("ClyvoVetOracle");
+
         services.AddDbContext<ClyvoVetContext>(options =>
         {
-            var connectionString = Environment.GetEnvironmentVariable("DEV_ENV_DB");
-            options.UseOracle(connectionString, b => b.UseOracleSQLCompatibility(OracleSQLCompatibility.DatabaseVersion19));
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                options.UseOracle(connectionString, b => b.UseOracleSQLCompatibility(OracleSQLCompatibility.DatabaseVersion19));
+            }
         });
-        
+
         return services;
     }
 }

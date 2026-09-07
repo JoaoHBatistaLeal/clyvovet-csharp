@@ -1,15 +1,22 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Oracle.ManagedDataAccess.Client; 
+using Oracle.ManagedDataAccess.Client;
 
 namespace ClyvoVetChallenge.Api.Exceptions;
 
-public class GlobalExceptionHandler(IHostEnvironment environment) : IExceptionHandler
+public class GlobalExceptionHandler(
+    ILogger<GlobalExceptionHandler> logger,
+    IHostEnvironment environment) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        var traceId = Activity.Current?.Id ?? httpContext.TraceIdentifier;
+
+        logger.LogError(exception, "Excecao nao tratada capturada: {Message} | TraceId: {TraceId}", exception.Message, traceId);
+
         var (statusCode, title, detail) = MapException(environment, exception);
-        
+
         httpContext.Response.StatusCode = statusCode;
         httpContext.Response.ContentType = "application/problem+json";
 
@@ -21,28 +28,33 @@ public class GlobalExceptionHandler(IHostEnvironment environment) : IExceptionHa
             Detail = environment.IsDevelopment() ? detail : "Ocorreu um erro inesperado.",
             Instance = httpContext.Request.Path
         };
-        
+
+        if (environment.IsDevelopment())
+        {
+            problem.Extensions["traceId"] = traceId;
+        }
+
         await httpContext.Response.WriteAsJsonAsync(problem, cancellationToken);
         return true;
     }
-    
-    private static (int StatusCode, string title, string? Detail) MapException(IHostEnvironment environment, Exception exception)
+
+    private static (int StatusCode, string Title, string? Detail) MapException(IHostEnvironment environment, Exception exception)
     {
         return exception switch
         {
-            ArgumentNullException e => (StatusCodes.Status400BadRequest, "Requisição inválida", e.Message),
-            ArgumentException e => (StatusCodes.Status400BadRequest, "Requisição inválida", e.Message),
-            InvalidOperationException e => (StatusCodes.Status400BadRequest, "Não foi possível concluir a operação", e.Message),
-            KeyNotFoundException e => (StatusCodes.Status404NotFound, "Recurso não encontrado", e.Message),
-            UnauthorizedAccessException e => (StatusCodes.Status401Unauthorized, "Não autorizado", e.Message),
-            OracleException e => (StatusCodes.Status500InternalServerError, "Erro de comunicação com o Banco de Dados", e.Message),
+            ArgumentNullException e => (StatusCodes.Status400BadRequest, "Requisicao invalida", e.Message),
+            ArgumentException e => (StatusCodes.Status400BadRequest, "Requisicao invalida", e.Message),
+            InvalidOperationException e => (StatusCodes.Status400BadRequest, "Nao foi possivel concluir a operacao", e.Message),
+            KeyNotFoundException e => (StatusCodes.Status404NotFound, "Recurso nao encontrado", e.Message),
+            UnauthorizedAccessException e => (StatusCodes.Status401Unauthorized, "Nao autorizado", e.Message),
+            OracleException e => (StatusCodes.Status500InternalServerError, "Erro de comunicacao com o Banco de Dados", e.Message),
             _ => MapUnhandled(environment, exception)
         };
     }
-    
+
     private static (int StatusCode, string Title, string? Detail) MapUnhandled(IHostEnvironment environment, Exception exception)
     {
-        return environment.IsDevelopment() 
+        return environment.IsDevelopment()
             ? (StatusCodes.Status500InternalServerError, "Erro interno do servidor", exception.ToString())
             : (StatusCodes.Status500InternalServerError, "Erro interno do servidor", "Ocorreu um erro inesperado.");
     }

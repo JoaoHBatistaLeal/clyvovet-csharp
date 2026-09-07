@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClyvoVetChallenge.Domain.Entities;
 
 namespace ClyvoVetChallenge.Application.DTOs;
@@ -11,6 +11,8 @@ public class ClinicaResponse
     public string Telefone { get; set; }
     public string Endereco { get; set; }
     public string HorarioFuncionamento { get; set; }
+
+    public ClinicaResponse() { }
 
     public ClinicaResponse(Clinica clinica)
     {

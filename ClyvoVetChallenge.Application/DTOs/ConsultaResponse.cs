@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClyvoVetChallenge.Domain.Entities;
 
 namespace ClyvoVetChallenge.Application.DTOs;
@@ -12,10 +12,12 @@ public class ConsultaResponse
     public DateOnly DataConsulta { get; set; }
     public TimeOnly HoraConsulta { get; set; }
     public string Motivo { get; set; }
-    public string Diagnostico { get; set; }
-    public string Observacoes { get; set; }
+    public string? Diagnostico { get; set; }
+    public string? Observacoes { get; set; }
     public string Status { get; set; }
     public string Tipo { get; set; }
+
+    public ConsultaResponse() { }
 
     public ConsultaResponse(Consulta consulta)
     {

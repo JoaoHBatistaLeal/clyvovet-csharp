@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\ClyvoVetChallenge.Api.props" />
-</Project>

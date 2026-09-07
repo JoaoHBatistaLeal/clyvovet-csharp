@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClyvoVetChallenge.Domain.Entities;
 
 namespace ClyvoVetChallenge.Application.DTOs;
@@ -13,6 +13,8 @@ public class AnimalResponse
     public string Sexo { get; set; }
     public DateOnly DataNascimento { get; set; }
     public decimal Peso { get; set; }
+
+    public AnimalResponse() { }
 
     public AnimalResponse(Animal animal)
     {

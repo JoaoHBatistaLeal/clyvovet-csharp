@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
@@ -37,8 +37,20 @@ public class AnimalController(IAnimalService animalService) : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public IActionResult Create([FromBody] AnimalRequest request)
     {
+        if (request.DataNascimento > DateOnly.FromDateTime(DateTime.UtcNow))
+        {
+            return UnprocessableEntity(new ProblemDetails
+            {
+                Type = "about:blank",
+                Title = "Entidade improcessavel",
+                Status = StatusCodes.Status422UnprocessableEntity,
+                Detail = "A data de nascimento nao pode ser uma data futura."
+            });
+        }
+
         var created = animalService.Create(request);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }

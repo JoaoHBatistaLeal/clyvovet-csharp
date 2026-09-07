@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClyvoVetChallenge.Domain.Entities;
 
 namespace ClyvoVetChallenge.Application.DTOs;
@@ -12,6 +12,8 @@ public class HistoricoResponse
     public string Descricao { get; set; }
     public string TipoEvento { get; set; }
     public string Resultado { get; set; }
+
+    public HistoricoResponse() { }
 
     public HistoricoResponse(Historico historico)
     {

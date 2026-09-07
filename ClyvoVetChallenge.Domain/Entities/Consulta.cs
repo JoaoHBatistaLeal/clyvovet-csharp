@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClyvoVetChallenge.Domain.Commons;
 using ClyvoVetChallenge.Domain.Enums;
 
@@ -12,8 +12,8 @@ public class Consulta : BaseEntity
     public DateOnly DataConsulta { get; private set; }
     public TimeOnly HoraConsulta { get; private set; }
     public string Motivo { get; private set; }
-    public string Diagnostico { get; private set; }
-    public string Observacoes { get; private set; }
+    public string? Diagnostico { get; private set; }
+    public string? Observacoes { get; private set; }
     public ConsultaStatus Status { get; private set; }
     public string Tipo { get; private set; }
 
@@ -33,7 +33,7 @@ public class Consulta : BaseEntity
         Status = ConsultaStatus.Agendada;
     }
 
-    public void UpdateResultado(string diagnostico, string observacoes, ConsultaStatus status)
+    public void UpdateResultado(string? diagnostico, string? observacoes, ConsultaStatus status)
     {
         Diagnostico = diagnostico;
         Observacoes = observacoes;

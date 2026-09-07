@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClyvoVetChallenge.Domain.Entities;
 
 namespace ClyvoVetChallenge.Application.DTOs;
@@ -13,6 +13,8 @@ public class PrescricaoResponse
     public int DuracaoDias { get; set; }
     public string Observacao { get; set; }
     public DateTime DataPrescricao { get; set; }
+
+    public PrescricaoResponse() { }
 
     public PrescricaoResponse(Prescricao prescricao)
     {

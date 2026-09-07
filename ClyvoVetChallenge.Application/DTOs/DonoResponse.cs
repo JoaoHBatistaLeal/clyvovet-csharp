@@ -1,4 +1,4 @@
-﻿using ClyvoVetChallenge.Domain.Entities;
+using ClyvoVetChallenge.Domain.Entities;
 
 namespace ClyvoVetChallenge.Application.DTOs;
 
@@ -11,6 +11,8 @@ public class DonoResponse
     public string Telefone { get; set; }
     public DateOnly DataNascimento { get; set; }
     public string Endereco { get; set; }
+
+    public DonoResponse() { }
 
     public DonoResponse(Dono dono)
     {

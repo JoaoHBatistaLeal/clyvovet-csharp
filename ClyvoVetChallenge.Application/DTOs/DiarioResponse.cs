@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClyvoVetChallenge.Domain.Entities;
@@ -10,6 +10,8 @@ public class DiarioSintomaResponse
     public Guid SintomaId { get; set; }
     public string NomeSintoma { get; set; }
     public string Intensidade { get; set; }
+
+    public DiarioSintomaResponse() { }
 
     public DiarioSintomaResponse(DiarioSintoma diarioSintoma)
     {
@@ -28,6 +30,8 @@ public class DiarioResponse
     public string ObservacaoLivre { get; set; }
     
     public List<DiarioSintomaResponse> Sintomas { get; set; } = new();
+
+    public DiarioResponse() { }
 
     public DiarioResponse(Diario diario)
     {

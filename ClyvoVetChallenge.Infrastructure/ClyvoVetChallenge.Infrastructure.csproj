@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
       <PackageReference Include="Oracle.EntityFrameworkCore" Version="9.23.26100" />
     </ItemGroup>
 

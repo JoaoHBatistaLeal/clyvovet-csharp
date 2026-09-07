@@ -1,0 +1,16 @@
+﻿**/[Oo]bj/
+**/[Bb]in/
+**/[Ll]og/
+**/[Ll]ogs/
+*.dll
+*.exe
+*.pdb
+*.user
+*.suo
+.vs/
+.idea/
+*.db
+*.db-shm
+*.db-wal
+*.log
+TestResults/

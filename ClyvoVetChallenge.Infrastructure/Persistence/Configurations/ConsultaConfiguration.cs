@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ClyvoVetChallenge.Domain.Entities;
 using ClyvoVetChallenge.Domain.Enums;
@@ -15,8 +15,8 @@ public class ConsultaConfiguration : IEntityTypeConfiguration<Consulta>
         builder.Property(x => x.DataConsulta).IsRequired();
         builder.Property(x => x.HoraConsulta).IsRequired();
         builder.Property(x => x.Motivo).IsRequired().HasMaxLength(500);
-        builder.Property(x => x.Diagnostico).HasMaxLength(1000);
-        builder.Property(x => x.Observacoes).HasMaxLength(1000);
+        builder.Property(x => x.Diagnostico).IsRequired(false).HasMaxLength(1000);
+        builder.Property(x => x.Observacoes).IsRequired(false).HasMaxLength(1000);
         
         builder.Property(x => x.Status)
             .IsRequired()
