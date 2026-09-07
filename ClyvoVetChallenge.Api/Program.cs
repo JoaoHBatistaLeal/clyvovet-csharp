@@ -23,6 +23,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
     .Enrich.FromLogContext()
     .Enrich.WithProperty("Application", "ClyvoVetChallenge.Api")
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{CorrelationId}] {Message:lj}{NewLine}{Exception}")
@@ -130,6 +131,8 @@ builder.Services.AddHealthChecks()
     .AddUrlGroup(new Uri("https://fiap.com.br"), name: "fiap-portal", failureStatus: HealthStatus.Degraded, tags: ["external", "ready"]);
 
 var app = builder.Build();
+
+Log.Information("ClyvoVet API iniciada com sucesso. Documentacao Swagger: http://localhost:5177/swagger");
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
