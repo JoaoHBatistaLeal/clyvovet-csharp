@@ -7,6 +7,7 @@ using ClyvoVetChallenge.Infrastructure.Persistence;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
@@ -33,11 +34,27 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
+var customPort = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(customPort))
+{
+    builder.WebHost.UseUrls($"http://*:{customPort}");
+}
+
 builder.Host.UseSerilog();
 
 builder.Services.AddDBContext(builder.Configuration);
 builder.Services.AddRepositories();
 builder.Services.AddServices();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerCustom();
@@ -45,6 +62,20 @@ builder.Services.AddSwaggerCustom();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
+
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? Environment.GetEnvironmentVariable("JWT_KEY");
+}
+if (string.IsNullOrEmpty(jwtKey) && builder.Environment.IsDevelopment())
+{
+    jwtKey = "clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!";
+}
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("Chave JWT nao configurada. Defina a variavel de ambiente JWT_SECRET.");
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -61,8 +92,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "ClyvoVetApi",
         ValidAudience = builder.Configuration["Jwt:Audience"] ?? "ClyvoVetApi",
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "clyvovet_super_secret_jwt_key_sprint_3_fiap_2026!"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 
@@ -101,6 +131,12 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+app.UseCors("AllowAll");
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
@@ -113,7 +149,7 @@ if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Dat
     db.Database.EnsureCreated();
 }
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("EnableSwagger"))
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
@@ -123,7 +159,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

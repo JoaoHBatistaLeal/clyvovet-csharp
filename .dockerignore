@@ -1,0 +1,14 @@
+﻿**/.git
+**/.gitignore
+**/.vs
+**/.idea
+**/bin
+**/obj
+**/logs
+*.db
+*.db-shm
+*.db-wal
+*.log
+.env
+.env.*
+TestResults

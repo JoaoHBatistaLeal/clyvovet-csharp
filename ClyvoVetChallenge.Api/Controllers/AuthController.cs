@@ -32,7 +32,10 @@ public class AuthController(IConfiguration configuration) : ControllerBase
             });
         }
 
-        if (request.Username != "admin" || request.Password != "admin123")
+        var expectedUsername = configuration["Auth:Username"] ?? Environment.GetEnvironmentVariable("AUTH_USERNAME") ?? "admin";
+        var expectedPassword = configuration["Auth:Password"] ?? Environment.GetEnvironmentVariable("AUTH_PASSWORD") ?? "admin123";
+
+        if (request.Username != expectedUsername || request.Password != expectedPassword)
         {
             return Unauthorized(new ProblemDetails
             {
@@ -43,8 +46,18 @@ public class AuthController(IConfiguration configuration) : ControllerBase
             });
         }
 
+        var jwtKey = configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? Environment.GetEnvironmentVariable("JWT_KEY");
+        }
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            jwtKey = "clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!";
+        }
+
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? "clyvovet_super_secret_jwt_key_sprint_3_fiap_2026!");
+        var key = Encoding.UTF8.GetBytes(jwtKey);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(
