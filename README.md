@@ -9,6 +9,9 @@ API RESTful desenvolvida em .NET 9.0 para projeto em colaboracao com a divisao d
 - Joao Henrique Batista Leal - RM: 564361
 - Juliana da Silva Stigliani - RM: 561171
 
+> [!NOTE]
+> **Aviso ao Professor / Avaliador:** O arquivo `script_bd.sql` localizado na raiz deste repositório é destinado exclusivamente aos requisitos e avaliação da disciplina de **DevOps Tools & Cloud Computing**, contendo o script DDL completo em sintaxe PostgreSQL com comentários estruturais nas tabelas/colunas core e carga inicial de dados.
+
 ---
 
 ## Arquitetura da Solucao
