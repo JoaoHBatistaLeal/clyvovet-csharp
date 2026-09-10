@@ -1,4 +1,12 @@
-﻿**/.git
+bin/
+obj/
+.git/
+.vs/
+.vscode/
+Dockerfile
+*.md
+
+**/.git
 **/.gitignore
 **/.vs
 **/.idea
@@ -12,3 +20,4 @@
 .env
 .env.*
 TestResults
+

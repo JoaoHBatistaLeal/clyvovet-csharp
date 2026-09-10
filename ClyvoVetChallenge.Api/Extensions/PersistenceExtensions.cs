@@ -56,14 +56,22 @@ public static class PersistenceExtensions
             return services;
         }
 
-        var connectionString = Environment.GetEnvironmentVariable("DEV_ENV_DB")
+        var connectionString = configuration.GetConnectionString("DefaultConnection")
+            ?? Environment.GetEnvironmentVariable("DEV_ENV_DB")
             ?? configuration.GetConnectionString("ClyvoVetOracle");
 
         services.AddDbContext<ClyvoVetContext>(options =>
         {
-            if (!string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrEmpty(connectionString)) return;
+
+            if (connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase) &&
+                !connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase))
             {
                 options.UseOracle(connectionString, b => b.UseOracleSQLCompatibility(OracleSQLCompatibility.DatabaseVersion19));
+            }
+            else
+            {
+                options.UseNpgsql(connectionString);
             }
         });
 

@@ -16,6 +16,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
+USER app
+
 COPY --from=build /app/publish .
-USER $APP_UID
+
 ENTRYPOINT ["dotnet", "ClyvoVetChallenge.Api.dll"]

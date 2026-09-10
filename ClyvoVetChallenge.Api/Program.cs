@@ -43,6 +43,7 @@ if (!string.IsNullOrEmpty(customPort))
 
 builder.Host.UseSerilog();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDBContext(builder.Configuration);
 builder.Services.AddRepositories();
 builder.Services.AddServices();
@@ -152,15 +153,12 @@ if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Dat
     db.Database.EnsureCreated();
 }
 
-if (app.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("EnableSwagger"))
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClyvoVet API V1");
-        c.RoutePrefix = "swagger";
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClyvoVet API v1");
+    c.RoutePrefix = "swagger"; 
+});
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -183,14 +181,13 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
     ResponseWriter = HealthCheckResponseWriter.WriteJsonResponse
 });
 
-if (!builder.Configuration.GetValue<bool>("Database:UseSqlite"))
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     try
     {
         var context = services.GetRequiredService<ClyvoVetContext>();
-        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DEV_ENV_DB")))
+        if (!builder.Configuration.GetValue<bool>("Database:UseSqlite"))
         {
             context.Database.Migrate();
         }
@@ -198,7 +195,15 @@ if (!builder.Configuration.GetValue<bool>("Database:UseSqlite"))
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Erro na migracao.");
+        logger.LogError(ex, "Erro ao aplicar migrations no banco de dados.");
+        try
+        {
+            var context = services.GetRequiredService<ClyvoVetContext>();
+            context.Database.EnsureCreated();
+        }
+        catch
+        {
+        }
     }
 }
 
