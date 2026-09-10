@@ -1,10 +1,13 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
+COPY ["ClyvoVetChallenge.sln", "./"]
 COPY ["ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj", "ClyvoVetChallenge.Api/"]
 COPY ["ClyvoVetChallenge.Application/ClyvoVetChallenge.Application.csproj", "ClyvoVetChallenge.Application/"]
 COPY ["ClyvoVetChallenge.Domain/ClyvoVetChallenge.Domain.csproj", "ClyvoVetChallenge.Domain/"]
 COPY ["ClyvoVetChallenge.Infrastructure/ClyvoVetChallenge.Infrastructure.csproj", "ClyvoVetChallenge.Infrastructure/"]
+COPY ["ClyvoVetChallenge.Tests.Unit/ClyvoVetChallenge.Tests.Unit.csproj", "ClyvoVetChallenge.Tests.Unit/"]
+COPY ["ClyvoVetChallenge.Tests.Integration/ClyvoVetChallenge.Tests.Integration.csproj", "ClyvoVetChallenge.Tests.Integration/"]
 
 RUN dotnet restore "ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj"
 
@@ -16,8 +19,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
+
+# Requisito 8.2: Execução com usuário não-root
 USER app
 
 COPY --from=build /app/publish .
-
 ENTRYPOINT ["dotnet", "ClyvoVetChallenge.Api.dll"]
