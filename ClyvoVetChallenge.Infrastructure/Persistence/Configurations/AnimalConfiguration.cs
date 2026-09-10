@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ClyvoVetChallenge.Domain.Entities;
 
@@ -19,7 +19,7 @@ public class AnimalConfiguration : IEntityTypeConfiguration<Animal>
         builder.Property(x => x.Peso).HasColumnType("decimal(5,2)").IsRequired();
 
         builder.HasOne(x => x.Dono)
-            .WithMany()
+            .WithMany(x => x.Animais)
             .HasForeignKey(x => x.DonoId)
             .OnDelete(DeleteBehavior.Restrict);
     }

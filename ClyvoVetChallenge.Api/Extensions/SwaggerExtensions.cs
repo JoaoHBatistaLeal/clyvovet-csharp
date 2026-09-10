@@ -11,13 +11,13 @@ public static class SwaggerExtensions
         {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "ClyvoVet API",
+                Title = "ByteCare API",
                 Version = "v1",
-                Description = "API RESTful para gestao de clinicas veterinarias, consultas, animais, prescricoes e historico medico.",
+                Description = "API RESTful ByteCare para gestao de clinicas veterinarias, consultas, animais, prescricoes e historico medico.",
                 Contact = new OpenApiContact
                 {
-                    Name = "Equipe ClyvoVet",
-                    Email = "contato@clyvovet.com"
+                    Name = "Equipe ByteCare",
+                    Email = "contato@bytecare.com"
                 }
             });
 

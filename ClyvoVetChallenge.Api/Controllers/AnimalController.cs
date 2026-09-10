@@ -7,7 +7,7 @@ namespace ClyvoVetChallenge.Api.Controllers;
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
-public class AnimalController(IAnimalService animalService) : ControllerBase
+public class AnimalController(IAnimalService animalService, IDonoService donoService) : ControllerBase
 {
     /// <summary>
     /// Lista todos os animais cadastrados.
@@ -48,6 +48,18 @@ public class AnimalController(IAnimalService animalService) : ControllerBase
                 Title = "Entidade improcessavel",
                 Status = StatusCodes.Status422UnprocessableEntity,
                 Detail = "A data de nascimento nao pode ser uma data futura."
+            });
+        }
+
+        var dono = donoService.GetById(request.DonoId);
+        if (dono is null)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Type = "about:blank",
+                Title = "Requisicao invalida",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = $"O dono com identificador '{request.DonoId}' nao existe."
             });
         }
 

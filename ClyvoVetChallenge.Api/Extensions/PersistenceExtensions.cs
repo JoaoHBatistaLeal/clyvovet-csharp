@@ -50,26 +50,17 @@ public static class PersistenceExtensions
             var sqliteConnectionString = configuration.GetConnectionString("ClyvoVetSqlite")
                 ?? "Data Source=clyvovet-dev.db";
 
-            services.AddDbContext<ClyvoVetContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(sqliteConnectionString));
 
             return services;
         }
 
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? Environment.GetEnvironmentVariable("DEV_ENV_DB")
-            ?? configuration.GetConnectionString("ClyvoVetOracle");
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<ClyvoVetContext>(options =>
+        services.AddDbContext<AppDbContext>(options =>
         {
-            if (string.IsNullOrEmpty(connectionString)) return;
-
-            if (connectionString.Contains("Data Source=", StringComparison.OrdinalIgnoreCase) &&
-                !connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase))
-            {
-                options.UseOracle(connectionString, b => b.UseOracleSQLCompatibility(OracleSQLCompatibility.DatabaseVersion19));
-            }
-            else
+            if (!string.IsNullOrEmpty(connectionString))
             {
                 options.UseNpgsql(connectionString);
             }

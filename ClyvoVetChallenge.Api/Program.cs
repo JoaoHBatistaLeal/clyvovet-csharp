@@ -128,12 +128,12 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddHealthChecks()
-    .AddDbContextCheck<ClyvoVetContext>("database", failureStatus: HealthStatus.Unhealthy, tags: ["db", "ready"])
+    .AddDbContextCheck<AppDbContext>("database", failureStatus: HealthStatus.Unhealthy, tags: ["db", "ready"])
     .AddUrlGroup(new Uri("https://fiap.com.br"), name: "fiap-portal", failureStatus: HealthStatus.Degraded, tags: ["external", "ready"]);
 
 var app = builder.Build();
 
-Log.Information("ClyvoVet API iniciada com sucesso. Documentacao Swagger: http://localhost:5177/swagger");
+Log.Information("ByteCare API iniciada com sucesso. Documentacao Swagger: http://localhost:8080/swagger");
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
@@ -146,17 +146,10 @@ app.UseSerilogRequestLogging();
 app.UseExceptionHandler();
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Database:UseSqlite"))
-{
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<ClyvoVetContext>();
-    db.Database.EnsureCreated();
-}
-
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClyvoVet API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ByteCare API v1");
     c.RoutePrefix = "swagger"; 
 });
 
@@ -186,8 +179,8 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<ClyvoVetContext>();
-        if (!builder.Configuration.GetValue<bool>("Database:UseSqlite"))
+        var context = services.GetRequiredService<AppDbContext>();
+        if (context.Database.IsNpgsql())
         {
             context.Database.Migrate();
         }
@@ -195,15 +188,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Erro ao aplicar migrations no banco de dados.");
-        try
-        {
-            var context = services.GetRequiredService<ClyvoVetContext>();
-            context.Database.EnsureCreated();
-        }
-        catch
-        {
-        }
+        logger.LogError(ex, "Erro ao aplicar migrations no PostgreSQL durante a inicialização.");
     }
 }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ClyvoVetChallenge.Domain.Entities;
 
@@ -19,5 +19,10 @@ public class DonoConfiguration : IEntityTypeConfiguration<Dono>
 
         builder.HasIndex(x => x.Cpf).IsUnique();
         builder.HasIndex(x => x.Email).IsUnique();
+
+        builder.HasMany(x => x.Animais)
+            .WithOne(x => x.Dono)
+            .HasForeignKey(x => x.DonoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

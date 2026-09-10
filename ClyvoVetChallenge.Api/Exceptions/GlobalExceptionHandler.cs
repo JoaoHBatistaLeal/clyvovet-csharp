@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Oracle.ManagedDataAccess.Client;
+using Npgsql;
 
 namespace ClyvoVetChallenge.Api.Exceptions;
 
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler(
             InvalidOperationException e => (StatusCodes.Status400BadRequest, "Nao foi possivel concluir a operacao", e.Message),
             KeyNotFoundException e => (StatusCodes.Status404NotFound, "Recurso nao encontrado", e.Message),
             UnauthorizedAccessException e => (StatusCodes.Status401Unauthorized, "Nao autorizado", e.Message),
-            OracleException e => (StatusCodes.Status500InternalServerError, "Erro de comunicacao com o Banco de Dados", e.Message),
+            NpgsqlException e => (StatusCodes.Status500InternalServerError, "Erro de comunicacao com o Banco de Dados", e.Message),
             _ => MapUnhandled(environment, exception)
         };
     }

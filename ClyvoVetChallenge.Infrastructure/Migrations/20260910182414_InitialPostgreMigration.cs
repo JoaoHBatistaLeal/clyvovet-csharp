@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ClyvoVetChallenge.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialPostgreMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,14 +15,14 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_CLINICA",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    Cnpj = table.Column<string>(type: "NVARCHAR2(18)", maxLength: 18, nullable: false),
-                    Email = table.Column<string>(type: "NVARCHAR2(150)", maxLength: 150, nullable: false),
-                    Telefone = table.Column<string>(type: "NVARCHAR2(20)", maxLength: 20, nullable: false),
-                    Endereco = table.Column<string>(type: "NVARCHAR2(255)", maxLength: 255, nullable: false),
-                    HorarioFuncionamento = table.Column<string>(type: "NVARCHAR2(100)", maxLength: 100, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Cnpj = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: false),
+                    Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Telefone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Endereco = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    HorarioFuncionamento = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,15 +33,15 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_DONO",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    Nome = table.Column<string>(type: "NVARCHAR2(150)", maxLength: 150, nullable: false),
-                    Cpf = table.Column<string>(type: "NVARCHAR2(14)", maxLength: 14, nullable: false),
-                    Email = table.Column<string>(type: "NVARCHAR2(150)", maxLength: 150, nullable: false),
-                    Telefone = table.Column<string>(type: "NVARCHAR2(20)", maxLength: 20, nullable: false),
-                    DataNascimento = table.Column<string>(type: "NVARCHAR2(10)", nullable: false),
-                    Endereco = table.Column<string>(type: "NVARCHAR2(255)", maxLength: 255, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Cpf = table.Column<string>(type: "character varying(14)", maxLength: 14, nullable: false),
+                    Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Telefone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    DataNascimento = table.Column<DateOnly>(type: "date", nullable: false),
+                    Endereco = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -52,10 +52,10 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_SINTOMA_CATALOGO",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    Nome = table.Column<string>(type: "NVARCHAR2(100)", maxLength: 100, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,14 +66,14 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_VETERINARIO",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    Nome = table.Column<string>(type: "NVARCHAR2(150)", maxLength: 150, nullable: false),
-                    Crmv = table.Column<string>(type: "NVARCHAR2(20)", maxLength: 20, nullable: false),
-                    Especialidade = table.Column<string>(type: "NVARCHAR2(100)", maxLength: 100, nullable: false),
-                    Telefone = table.Column<string>(type: "NVARCHAR2(20)", maxLength: 20, nullable: false),
-                    Email = table.Column<string>(type: "NVARCHAR2(150)", maxLength: 150, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Crmv = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Especialidade = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Telefone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -84,16 +84,16 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_ANIMAL",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    DonoId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    Nome = table.Column<string>(type: "NVARCHAR2(100)", maxLength: 100, nullable: false),
-                    Especie = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    Raca = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    Sexo = table.Column<string>(type: "NVARCHAR2(20)", maxLength: 20, nullable: false),
-                    DataNascimento = table.Column<string>(type: "NVARCHAR2(10)", nullable: false),
-                    Peso = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DonoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Especie = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Raca = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Sexo = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    DataNascimento = table.Column<DateOnly>(type: "date", nullable: false),
+                    Peso = table.Column<decimal>(type: "numeric(5,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -110,19 +110,19 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_CONSULTA",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    AnimalId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    VeterinarioId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    ClinicaId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    DataConsulta = table.Column<string>(type: "NVARCHAR2(10)", nullable: false),
-                    HoraConsulta = table.Column<string>(type: "NVARCHAR2(48)", nullable: false),
-                    Motivo = table.Column<string>(type: "NVARCHAR2(500)", maxLength: 500, nullable: false),
-                    Diagnostico = table.Column<string>(type: "NVARCHAR2(1000)", maxLength: 1000, nullable: false),
-                    Observacoes = table.Column<string>(type: "NVARCHAR2(1000)", maxLength: 1000, nullable: false),
-                    Status = table.Column<string>(type: "NVARCHAR2(20)", maxLength: 20, nullable: false),
-                    Tipo = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AnimalId = table.Column<Guid>(type: "uuid", nullable: false),
+                    VeterinarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClinicaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DataConsulta = table.Column<DateOnly>(type: "date", nullable: false),
+                    HoraConsulta = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    Motivo = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Diagnostico = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    Observacoes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    Tipo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,13 +151,13 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_DIARIO",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    AnimalId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    DataRegistro = table.Column<string>(type: "NVARCHAR2(10)", nullable: false),
-                    HoraRegistro = table.Column<string>(type: "NVARCHAR2(48)", nullable: false),
-                    ObservacaoLivre = table.Column<string>(type: "NVARCHAR2(1000)", maxLength: 1000, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AnimalId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DataRegistro = table.Column<DateOnly>(type: "date", nullable: false),
+                    HoraRegistro = table.Column<TimeOnly>(type: "time without time zone", nullable: false),
+                    ObservacaoLivre = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -174,15 +174,15 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_HISTORICO",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    AnimalId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    ConsultaId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    DataRegistro = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Descricao = table.Column<string>(type: "NVARCHAR2(500)", maxLength: 500, nullable: false),
-                    TipoEvento = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    Resultado = table.Column<string>(type: "NVARCHAR2(500)", maxLength: 500, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AnimalId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConsultaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    DataRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Descricao = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    TipoEvento = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Resultado = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -205,16 +205,16 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_PRESCRICAO",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    ConsultaId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    Medicamento = table.Column<string>(type: "NVARCHAR2(150)", maxLength: 150, nullable: false),
-                    Dosagem = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    Frequencia = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    DuracaoDias = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    Observacao = table.Column<string>(type: "NVARCHAR2(500)", maxLength: 500, nullable: false),
-                    DataPrescricao = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConsultaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Medicamento = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Dosagem = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Frequencia = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    DuracaoDias = table.Column<int>(type: "integer", nullable: false),
+                    Observacao = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    DataPrescricao = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -231,12 +231,12 @@ namespace ClyvoVetChallenge.Infrastructure.Migrations
                 name: "TB_DIARIO_SINTOMA",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    DiarioId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    SintomaId = table.Column<Guid>(type: "RAW(16)", nullable: false),
-                    Intensidade = table.Column<string>(type: "NVARCHAR2(50)", maxLength: 50, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TIMESTAMP(7)", nullable: false),
-                    Active = table.Column<bool>(type: "NUMBER(1)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    DiarioId = table.Column<Guid>(type: "uuid", nullable: false),
+                    SintomaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Intensidade = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
