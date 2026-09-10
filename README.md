@@ -308,3 +308,351 @@ dotnet test --filter "FullyQualifiedName~ConsultaApiTests"
    - 28 testes de integracao cobrindo o ciclo HTTP com `WebApplicationFactory<Program>`, validando codigos 200, 201, 204, 400, 401, 404 e 422.
    - Total de 120 testes automatizados integrados e aprovados.
 
+---
+
+# Avaliação DevOps Tools & Cloud Computing — Sprint 4
+
+> [!IMPORTANT]
+> Esta seção foi elaborada exclusivamente para a avaliação da disciplina **DevOps Tools & Cloud Computing**, cobrindo a arquitetura em nuvem Microsoft Azure (ACR + ACI), segurança de containers, scripts de automação (How To), descrição da solução e negócios, e evidência de testes e integração 100% funcionais.
+
+---
+
+## 1. Descrição da Solução
+
+A **ByteCare API** (Clyvo Vet) é uma solução RESTful desenvolvida em **.NET 9.0** com arquitetura em camadas (DDD / Clean Architecture) e persistência relacional com **PostgreSQL 16**.
+A aplicação é responsável por digitalizar e gerenciar integralmente o ecossistema de clínicas e hospitais veterinários, abrangendo:
+- **Gestão de Tutores e Pacientes:** Cadastro completo de donos (tutores) e animais com histórico de nascimento, espécie, raça e peso.
+- **Estrutura de Atendimento:** Registro de clínicas veterinárias (CNPJ, endereço, horário) e corpo clínico (médicos veterinários com CRMV validado).
+- **Consultas e Prescrições:** Agendamento de consultas presenciais/remotas, pareceres diagnósticos e prescrições médicas de tratamentos com posologia.
+- **Acompanhamento Clínico:** Diários de sintomas com catálogo pré-definido de enfermidades e histórico médico contínuo.
+- **Observabilidade Integrada:** Health checks nativos (`/health`, `/health/ready`, `/health/live`) e instrumentação OpenTelemetry exportando métricas Prometheus (`/metrics`).
+
+---
+
+## 2. Descrição dos Benefícios para o Negócio
+
+A implantação da solução em nuvem traz impactos diretos e mensuráveis para as clínicas parceiras da Clyvo:
+1. **Padronização e Segurança da Informação:** Elimina prontuários em papel e controles descentralizados, unificando os dados clínicos com integridade referencial rígida no PostgreSQL.
+2. **Prevenção de Erros Clínicos e Retrabalho:** Histórico centralizado e diário de sintomas acessíveis em tempo real pelo veterinário durante a consulta, aumentando a precisão de diagnósticos.
+3. **Escalabilidade Elástica e Redução de Custos de Infraestrutura:** Ao adotar **Azure Container Instances (ACI)** e **Azure Container Registry (ACR)**, a organização elimina gastos com servidores físicos on-premises, pagando estritamente pelos segundos de computação consumidos e com tempo de inicialização de segundos.
+4. **Alta Disponibilidade e Resiliência:** Monitoramento contínuo de integridade via sondas de Health Check com validação ativa de banco de dados e observabilidade por métricas.
+5. **Segurança Corporativa:** Execução de containers com usuário não-root (princípio do menor privilégio) e isolamento em nuvem pública da Microsoft Azure.
+
+---
+
+## 3. Conformidade com os Requisitos de Avaliação (ACR + ACI)
+
+| Requisito | Descrição | Status no Projeto |
+| :--- | :--- | :--- |
+| **8.1** | Todos os recursos (App e Banco) criados via Azure CLI | **100% Conforme** — Provisionamento automatizado no script `deploy.sh` via `az group create`, `az acr create`, `az storage account create` e `az container create`. |
+| **8.2** | Container do App não roda como root ou admin | **100% Conforme** — Diretiva `USER app` explícita no `Dockerfile`, executando como `uid=1654(app)` / `gid=1654(app)`. |
+| **8.3** | Uso de Dockerfile ou Docker Compose | **100% Conforme** — Disponibilizados `Dockerfile` multi-stage e `docker-compose.yml` na raiz do repositório. |
+| **8.4** | Scripts de build/execução e comandos detalhados no README | **100% Conforme** — Comandos `docker build`, `docker push`, `docker run` e automação completa documentados a seguir. |
+| **9.3** | Demonstração detalhada de CRUD diretamente no Banco por SELECT | **100% Conforme** — Evidências de INSERT, SELECT, UPDATE e DELETE validadas via API e confirmadas com queries SQL diretamente na instância PostgreSQL em nuvem. |
+
+---
+
+## 4. Guia Passo a Passo de Deploy na Nuvem (How To)
+
+### 4.1. Pré-requisitos
+- [Azure CLI](https://learn.microsoft.com/pt-br/cli/azure/install-azure-cli) instalado e autenticado (`az login`).
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) em execução.
+- Ambiente Bash (Linux, macOS, WSL ou Git Bash no Windows).
+
+### 4.2. Autenticação no Azure
+Certifique-se de estar conectado na assinatura correta:
+```bash
+az login
+az account show --output table
+```
+
+### 4.3. Variáveis de Ambiente e Execução do Deploy
+Defina as credenciais do banco e dispare o script de automação:
+```bash
+export DB_USER="bytecare_admin"
+export DB_PASSWORD="ByteK4re!"
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### 4.4. Comandos Manuais Utilizados no Script (`deploy.sh`)
+
+Caso deseje executar os passos individualmente:
+
+1. **Criação do Resource Group:**
+   ```bash
+   az group create --name rg-bytecare --location brazilsouth
+   ```
+
+2. **Criação e Autenticação no Azure Container Registry (ACR):**
+   ```bash
+   az acr create --resource-group rg-bytecare --name acrbytecare --sku Basic --admin-enabled true
+   az acr login --name acrbytecare
+   ```
+
+3. **Obtenção de Credenciais do ACR:**
+   ```bash
+   ACR_LOGIN_SERVER=$(az acr show --name acrbytecare --query "loginServer" -o tsv)
+   ACR_USERNAME=$(az acr credential show --name acrbytecare --query "username" -o tsv)
+   ACR_PASSWORD=$(az acr credential show --name acrbytecare --query "passwords[0].value" -o tsv)
+   docker login $ACR_LOGIN_SERVER -u $ACR_USERNAME -p $ACR_PASSWORD
+   ```
+
+4. **Container do Banco de Dados PostgreSQL (ACR + ACI):**
+   ```bash
+   # Pull, tag e push da imagem PostgreSQL 16 para o ACR
+   docker pull postgres:16-alpine
+   docker tag postgres:16-alpine ${ACR_LOGIN_SERVER}/postgres-bytecare:v1
+   docker push ${ACR_LOGIN_SERVER}/postgres-bytecare:v1
+
+   # Provisionamento do container do banco no ACI
+   az container create \
+     --resource-group rg-bytecare \
+     --name aci-db-bytecare \
+     --image ${ACR_LOGIN_SERVER}/postgres-bytecare:v1 \
+     --os-type Linux \
+     --cpu 1 \
+     --memory 1.5 \
+     --registry-login-server ${ACR_LOGIN_SERVER} \
+     --registry-username $ACR_USERNAME \
+     --registry-password $ACR_PASSWORD \
+     --dns-name-label db-bytecare \
+     --ports 5432 \
+     --environment-variables \
+       POSTGRES_DB="db_bytecare" \
+       POSTGRES_USER="$DB_USER" \
+       POSTGRES_PASSWORD="$DB_PASSWORD"
+   ```
+
+5. **Build, Tag e Push da Imagem do App .NET para o ACR:**
+   ```bash
+   docker build -t ${ACR_LOGIN_SERVER}/api-bytecare:v1 .
+   docker push ${ACR_LOGIN_SERVER}/api-bytecare:v1
+   ```
+
+6. **Provisionamento do Container do App no ACI (com Usuário Não-Root):**
+   ```bash
+   DB_HOST="db-bytecare.brazilsouth.azurecontainer.io"
+
+   az container create \
+     --resource-group rg-bytecare \
+     --name aci-api-bytecare \
+     --image ${ACR_LOGIN_SERVER}/api-bytecare:v1 \
+     --os-type Linux \
+     --cpu 1 \
+     --memory 1.5 \
+     --registry-login-server ${ACR_LOGIN_SERVER} \
+     --registry-username $ACR_USERNAME \
+     --registry-password $ACR_PASSWORD \
+     --dns-name-label api-bytecare \
+     --ports 8080 \
+     --environment-variables \
+       ASPNETCORE_ENVIRONMENT="Production" \
+       ASPNETCORE_HTTP_PORTS="8080" \
+       PORT="8080" \
+       JWT_SECRET="clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!" \
+       ConnectionStrings__DefaultConnection="Host=${DB_HOST};Port=5432;Database=db_bytecare;Username=${DB_USER};Password=${DB_PASSWORD}" \
+       DB_HOST="$DB_HOST" \
+       DB_PORT="5432" \
+       DB_NAME="db_bytecare" \
+       DB_USER="$DB_USER" \
+       DB_PASSWORD="$DB_PASSWORD"
+   ```
+
+7. **Consulta dos Endereços IP e FQDN:**
+   ```bash
+   az container list --resource-group rg-bytecare --output table
+   ```
+
+---
+
+## 5. Evidência de Segurança: Usuário Não-Root (Requisito 8.2)
+
+O arquivo `Dockerfile` define explicitamente no estágio final de execução:
+```dockerfile
+# Execução com usuário não-root (Requisito 8.2)
+USER app
+```
+
+Ao inspecionar o processo dentro do container em execução no Azure ACI via comando:
+```bash
+az container exec --resource-group rg-bytecare --name aci-api-bytecare --exec-command "id"
+```
+Obtém-se a saída que comprova que a aplicação opera sem privilégios administrativos:
+```
+uid=1654(app) gid=1654(app) groups=1654(app)
+```
+
+---
+
+## 6. Demonstração Detalhada do CRUD com Integração Total (Requisito 9.3)
+
+Abaixo está o registro passo a passo demonstrando a integração ponta a ponta entre a API e o PostgreSQL em nuvem:
+
+### Passo 1: Inserção de Registro (CREATE)
+Requisição HTTP via cURL / Swagger:
+```bash
+curl -X POST "http://<API_IP>:8080/api/Dono" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Gabriel Siqueira",
+    "cpf": "987.654.321-99",
+    "email": "gabriel.siqueira@bytecare.com",
+    "telefone": "(11) 91234-5678",
+    "dataNascimento": "1995-08-20",
+    "endereco": "Rua Vergueiro, 1000 - SP"
+  }'
+```
+**Resposta HTTP (201 Created):**
+```json
+{
+  "id": "cb652095-db91-498f-bc59-741a7dd3c3de",
+  "nome": "Gabriel Siqueira",
+  "cpf": "987.654.321-99",
+  "email": "gabriel.siqueira@bytecare.com",
+  "telefone": "(11) 91234-5678",
+  "dataNascimento": "1995-08-20",
+  "endereco": "Rua Vergueiro, 1000 - SP"
+}
+```
+
+**Evidência direta no Banco de Dados via `SELECT`:**
+```sql
+SELECT "Id", "Nome", "Cpf", "Email", "Telefone", "Endereco", "CreatedAt", "Active"
+FROM "TB_DONO"
+WHERE "Id" = 'cb652095-db91-498f-bc59-741a7dd3c3de';
+```
+**Resultado no PostgreSQL:**
+```
+                  Id                  |       Nome       |      Cpf       |             Email             |    Telefone     |         Endereco         |           CreatedAt           | Active 
+--------------------------------------+------------------+----------------+-------------------------------+-----------------+--------------------------+-------------------------------+--------
+ cb652095-db91-498f-bc59-741a7dd3c3de | Gabriel Siqueira | 987.654.321-99 | gabriel.siqueira@bytecare.com | (11) 91234-5678 | Rua Vergueiro, 1000 - SP | 2026-09-10 22:00:03.494627+00 | t
+(1 row)
+```
+
+---
+
+### Passo 2: Consulta de Registros (READ)
+Requisição HTTP via cURL:
+```bash
+curl -X GET "http://<API_IP>:8080/api/Dono/cb652095-db91-498f-bc59-741a7dd3c3de"
+```
+**Resposta HTTP (200 OK):**
+```json
+{
+  "id": "cb652095-db91-498f-bc59-741a7dd3c3de",
+  "nome": "Gabriel Siqueira",
+  "cpf": "987.654.321-99",
+  "email": "gabriel.siqueira@bytecare.com",
+  "telefone": "(11) 91234-5678",
+  "dataNascimento": "1995-08-20",
+  "endereco": "Rua Vergueiro, 1000 - SP"
+}
+```
+
+---
+
+### Passo 3: Atualização do Registro (UPDATE)
+Requisição HTTP via cURL:
+```bash
+curl -X PUT "http://<API_IP>:8080/api/Dono/cb652095-db91-498f-bc59-741a7dd3c3de" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Gabriel Siqueira Silva",
+    "cpf": "987.654.321-99",
+    "email": "gabriel.silva@bytecare.com",
+    "telefone": "(11) 99999-0000",
+    "dataNascimento": "1995-08-20",
+    "endereco": "Av. Paulista, 2000 - Apto 101, SP"
+  }'
+```
+**Resposta HTTP (200 OK):**
+```json
+{
+  "id": "cb652095-db91-498f-bc59-741a7dd3c3de",
+  "nome": "Gabriel Siqueira Silva",
+  "cpf": "987.654.321-99",
+  "email": "gabriel.silva@bytecare.com",
+  "telefone": "(11) 99999-0000",
+  "dataNascimento": "1995-08-20",
+  "endereco": "Av. Paulista, 2000 - Apto 101, SP"
+}
+```
+
+**Evidência direta no Banco de Dados via `SELECT`:**
+```sql
+SELECT "Id", "Nome", "Cpf", "Email", "Telefone", "Endereco", "Active"
+FROM "TB_DONO"
+WHERE "Id" = 'cb652095-db91-498f-bc59-741a7dd3c3de';
+```
+**Resultado no PostgreSQL:**
+```
+                  Id                  |          Nome          |      Cpf       |           Email            |    Telefone     |             Endereco              | Active 
+--------------------------------------+------------------------+----------------+----------------------------+-----------------+-----------------------------------+--------
+ cb652095-db91-498f-bc59-741a7dd3c3de | Gabriel Siqueira Silva | 987.654.321-99 | gabriel.silva@bytecare.com | (11) 99999-0000 | Av. Paulista, 2000 - Apto 101, SP | t
+(1 row)
+```
+
+---
+
+### Passo 4: Exclusão do Registro (DELETE)
+Requisição HTTP via cURL:
+```bash
+curl -X DELETE "http://<API_IP>:8080/api/Dono/cb652095-db91-498f-bc59-741a7dd3c3de"
+```
+**Resposta HTTP (204 No Content)**
+
+**Evidência direta no Banco de Dados via `SELECT`:**
+```sql
+SELECT "Id", "Nome", "Active"
+FROM "TB_DONO"
+WHERE "Id" = 'cb652095-db91-498f-bc59-741a7dd3c3de';
+```
+**Resultado no PostgreSQL:**
+```
+ Id | Nome | Active 
+----+------+--------
+(0 rows)
+```
+*(Registro completamente removido do banco de dados relacional).*
+
+> **Nota sobre Integridade Referencial:** Caso um registro possua dependentes (por exemplo, um Dono que possui Animais, ou um Animal que possui Consultas), o banco de dados PostgreSQL bloqueia a exclusão cascading via Foreign Key (`FK_TB_ANIMAL_TB_DONO_DonoId` / `FK_TB_CONSULTA_TB_ANIMAL_AnimalId`), assegurando a integridade e consistência relacional dos dados.
+
+---
+
+### Passo 5: Teste de Integridade e Conectividade do Banco (`/health`)
+```bash
+curl -s http://<API_IP>:8080/health
+```
+**Resposta HTTP:**
+```json
+{
+  "status": "Healthy",
+  "duration": "00:00:01.2769822",
+  "checks": [
+    {
+      "name": "database",
+      "status": "Healthy",
+      "description": null,
+      "duration": "00:00:00.0666526",
+      "error": null
+    },
+    {
+      "name": "fiap-portal",
+      "status": "Healthy",
+      "description": null,
+      "duration": "00:00:01.2251252",
+      "error": null
+    }
+  ]
+}
+```
+
+---
+
+## 7. Descomissionamento dos Serviços na Nuvem
+
+Após a validação e testes da aplicação, todos os recursos podem ser desalocados para evitar custos:
+```bash
+az group delete --name rg-bytecare --yes --no-wait
+```
