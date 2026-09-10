@@ -310,7 +310,7 @@ dotnet test --filter "FullyQualifiedName~ConsultaApiTests"
 
 ---
 
-# Avaliação DevOps Tools & Cloud Computing: Sprint 4
+# Avaliação DevOps Tools & Cloud Computing: Sprint 3
 
 > [!IMPORTANT]
 > Seção destinada à avaliação da disciplina DevOps Tools & Cloud Computing, cobrindo arquitetura em nuvem Microsoft Azure com Container Registry e Container Instances, segurança de containers, instruções de deploy e testes de integração.
