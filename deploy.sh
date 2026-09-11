@@ -2,6 +2,9 @@
 set -euo pipefail
 export MSYS_NO_PATHCONV=1
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
 RESOURCE_GROUP="rg-bytecare"
 LOCATION="brazilsouth"
 ACR_NAME="acrbytecare"
@@ -34,22 +37,28 @@ az acr import \
   --image postgres-bytecare:v1 \
   --force
 
-az container create \
-  --resource-group "$RESOURCE_GROUP" \
-  --name aci-db-bytecare \
-  --image "${ACR_LOGIN_SERVER}/postgres-bytecare:v1" \
-  --os-type Linux \
-  --cpu 1 \
-  --memory 1.5 \
-  --registry-login-server "${ACR_LOGIN_SERVER}" \
-  --registry-username "$ACR_USERNAME" \
-  --registry-password "$ACR_PASSWORD" \
-  --dns-name-label db-bytecare \
-  --ports 5432 \
-  --environment-variables \
-    POSTGRES_DB="$DB_NAME" \
-    POSTGRES_USER="$DB_USER" \
-    POSTGRES_PASSWORD="$DB_PASSWORD"
+DB_STATE=$(az container show --resource-group "$RESOURCE_GROUP" --name aci-db-bytecare --query "instanceView.state" -o tsv 2>/dev/null || echo "NotFound")
+if [ "$DB_STATE" != "Running" ]; then
+  echo "Criando container aci-db-bytecare..."
+  az container create \
+    --resource-group "$RESOURCE_GROUP" \
+    --name aci-db-bytecare \
+    --image "${ACR_LOGIN_SERVER}/postgres-bytecare:v1" \
+    --os-type Linux \
+    --cpu 1 \
+    --memory 1.5 \
+    --registry-login-server "${ACR_LOGIN_SERVER}" \
+    --registry-username "$ACR_USERNAME" \
+    --registry-password "$ACR_PASSWORD" \
+    --dns-name-label db-bytecare \
+    --ports 5432 \
+    --environment-variables \
+      POSTGRES_DB="$DB_NAME" \
+      POSTGRES_USER="$DB_USER" \
+      POSTGRES_PASSWORD="$DB_PASSWORD"
+else
+  echo "Container aci-db-bytecare já está em execução (Running). Preservando dados do banco."
+fi
 
 DB_HOST="db-bytecare.${LOCATION}.azurecontainer.io"
 
@@ -65,6 +74,11 @@ done
 
 docker build -t "${ACR_LOGIN_SERVER}/api-bytecare:v1" .
 docker push "${ACR_LOGIN_SERVER}/api-bytecare:v1"
+
+if az container show --resource-group "$RESOURCE_GROUP" --name aci-api-bytecare --query "name" -o tsv 2>/dev/null | grep -q "aci-api-bytecare"; then
+  echo "Removendo container aci-api-bytecare anterior para deploy limpo da nova versão..."
+  az container delete --resource-group "$RESOURCE_GROUP" --name aci-api-bytecare --yes >/dev/null 2>&1 || true
+fi
 
 az container create \
   --resource-group "$RESOURCE_GROUP" \
