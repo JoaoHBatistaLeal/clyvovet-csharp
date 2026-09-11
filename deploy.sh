@@ -8,8 +8,9 @@ ACR_NAME="acrbytecare"
 DB_NAME="db_bytecare"
 API_PORT="8080"
 
-: "${DB_PASSWORD:?Defina a variável DB_PASSWORD antes de executar}"
-: "${DB_USER:?Defina a variável DB_USER antes de executar}"
+: "${DB_USER:=bytecare_admin}"
+: "${DB_PASSWORD:=ByteK4re!}"
+: "${JWT_SECRET:=clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!}"
 
 az group create \
   --name "$RESOURCE_GROUP" \
@@ -52,7 +53,15 @@ az container create \
 
 DB_HOST="db-bytecare.${LOCATION}.azurecontainer.io"
 
-sleep 20
+echo "Aguardando o banco de dados aci-db-bytecare iniciar..."
+for i in $(seq 1 30); do
+  DB_STATE=$(az container show --resource-group "$RESOURCE_GROUP" --name aci-db-bytecare --query "instanceView.state" -o tsv 2>/dev/null || echo "Starting")
+  if [ "$DB_STATE" = "Running" ]; then
+    echo "Banco aci-db-bytecare está Running!"
+    break
+  fi
+  sleep 4
+done
 
 docker build -t "${ACR_LOGIN_SERVER}/api-bytecare:v1" .
 docker push "${ACR_LOGIN_SERVER}/api-bytecare:v1"
@@ -72,6 +81,8 @@ az container create \
   --environment-variables \
     ASPNETCORE_ENVIRONMENT="Production" \
     ASPNETCORE_HTTP_PORTS="$API_PORT" \
+    PORT="$API_PORT" \
+    JWT_SECRET="$JWT_SECRET" \
     ConnectionStrings__DefaultConnection="Host=${DB_HOST};Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}" \
     DB_HOST="$DB_HOST" \
     DB_PORT="5432" \
@@ -79,8 +90,38 @@ az container create \
     DB_USER="$DB_USER" \
     DB_PASSWORD="$DB_PASSWORD"
 
+API_FQDN="api-bytecare.${LOCATION}.azurecontainer.io"
+
+echo "Aguardando a API aci-api-bytecare iniciar..."
+for i in $(seq 1 30); do
+  API_STATE=$(az container show --resource-group "$RESOURCE_GROUP" --name aci-api-bytecare --query "instanceView.state" -o tsv 2>/dev/null || echo "Starting")
+  if [ "$API_STATE" = "Running" ]; then
+    echo "API aci-api-bytecare está Running!"
+    break
+  fi
+  sleep 5
+done
+
 az container list --resource-group "$RESOURCE_GROUP" --output table
 
-API_FQDN="api-bytecare.${LOCATION}.azurecontainer.io"
-echo "API: http://${API_FQDN}:${API_PORT}/swagger"
+echo ""
+echo "=========================================="
+echo "Endpoints ByteCare API:"
+echo "Swagger:  http://${API_FQDN}:${API_PORT}/swagger"
+echo "Health:   http://${API_FQDN}:${API_PORT}/health"
+echo "Metrics:  http://${API_FQDN}:${API_PORT}/metrics"
 echo "Database: ${DB_HOST}:5432"
+echo "=========================================="
+echo ""
+
+echo "Verificando se a API está online e se comunicando com o banco..."
+for i in $(seq 1 15); do
+  HEALTH_RESP=$(curl -s "http://${API_FQDN}:${API_PORT}/health" || true)
+  if echo "$HEALTH_RESP" | grep -qi '"status": *"Healthy"'; then
+    echo "Sucesso! API está online e conectada ao banco de dados:"
+    echo "$HEALTH_RESP"
+    break
+  fi
+  echo "Aguardando /health responder status Healthy (tentativa $i/15)..."
+  sleep 5
+done

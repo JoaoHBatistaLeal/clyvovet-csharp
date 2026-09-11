@@ -68,15 +68,13 @@ builder.Services.AddControllers();
 var jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKey))
 {
-    jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? Environment.GetEnvironmentVariable("JWT_KEY");
-}
-if (string.IsNullOrEmpty(jwtKey) && builder.Environment.IsDevelopment())
-{
-    jwtKey = "clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!";
+    jwtKey = builder.Configuration["JWT_SECRET"]
+        ?? Environment.GetEnvironmentVariable("JWT_SECRET")
+        ?? Environment.GetEnvironmentVariable("JWT_KEY");
 }
 if (string.IsNullOrEmpty(jwtKey))
 {
-    throw new InvalidOperationException("Chave JWT nao configurada. Defina a variavel de ambiente JWT_SECRET.");
+    jwtKey = "clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!";
 }
 
 builder.Services.AddAuthentication(options =>
@@ -177,17 +175,32 @@ app.MapHealthChecks("/health/live", new HealthCheckOptions
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
         var context = services.GetRequiredService<AppDbContext>();
         if (context.Database.IsNpgsql())
         {
-            context.Database.Migrate();
+            var maxRetries = 10;
+            for (var retry = 1; retry <= maxRetries; retry++)
+            {
+                try
+                {
+                    logger.LogInformation("Tentando aplicar migrations no PostgreSQL (tentativa {Retry}/{MaxRetries})...", retry, maxRetries);
+                    context.Database.Migrate();
+                    logger.LogInformation("Migrations aplicadas com sucesso no PostgreSQL.");
+                    break;
+                }
+                catch (Exception ex) when (retry < maxRetries)
+                {
+                    logger.LogWarning(ex, "Falha ao conectar ou aplicar migrations no PostgreSQL (tentativa {Retry}/{MaxRetries}). Aguardando 3s...", retry, maxRetries);
+                    Thread.Sleep(3000);
+                }
+            }
         }
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Erro ao aplicar migrations no PostgreSQL durante a inicialização.");
     }
 }

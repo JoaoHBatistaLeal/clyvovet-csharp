@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 COPY ["ClyvoVetChallenge.sln", "./"]
@@ -20,8 +20,10 @@ WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_HTTP_PORTS=8080
 
+RUN mkdir -p /app/logs && chown -R app:app /app
+
 # Requisito 8.2: Execução com usuário não-root
 USER app
 
-COPY --from=build /app/publish .
+COPY --chown=app:app --from=build /app/publish .
 ENTRYPOINT ["dotnet", "ClyvoVetChallenge.Api.dll"]
