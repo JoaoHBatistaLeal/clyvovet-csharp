@@ -14,11 +14,13 @@ public class AuthController(IConfiguration configuration) : ControllerBase
 {
     /// <summary>
     /// Realiza a autenticacao do usuario e gera o token JWT.
+    /// As credenciais sao validadas estritamente contra o Azure Key Vault ou variaveis seguras de ambiente.
     /// </summary>
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult Login([FromBody] LoginRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
@@ -32,8 +34,27 @@ public class AuthController(IConfiguration configuration) : ControllerBase
             });
         }
 
-        var expectedUsername = configuration["Auth:Username"] ?? Environment.GetEnvironmentVariable("AUTH_USERNAME") ?? "admin";
-        var expectedPassword = configuration["Auth:Password"] ?? Environment.GetEnvironmentVariable("AUTH_PASSWORD") ?? "admin123";
+        var expectedUsername = configuration["Auth:Username"]
+            ?? configuration["Auth--Username"]
+            ?? configuration["AUTH_USERNAME"]
+            ?? Environment.GetEnvironmentVariable("AUTH_USERNAME")
+            ?? "admin";
+
+        var expectedPassword = configuration["Auth:Password"]
+            ?? configuration["Auth--Password"]
+            ?? configuration["AUTH_PASSWORD"]
+            ?? Environment.GetEnvironmentVariable("AUTH_PASSWORD");
+
+        if (string.IsNullOrWhiteSpace(expectedPassword))
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProblemDetails
+            {
+                Type = "about:blank",
+                Title = "Autenticacao nao configurada",
+                Status = StatusCodes.Status500InternalServerError,
+                Detail = "A senha administrativa nao foi configurada no Azure Key Vault ou variavel de ambiente. Login bloqueado por seguranca."
+            });
+        }
 
         if (request.Username != expectedUsername || request.Password != expectedPassword)
         {
@@ -46,14 +67,17 @@ public class AuthController(IConfiguration configuration) : ControllerBase
             });
         }
 
-        var jwtKey = configuration["Jwt:Key"];
-        if (string.IsNullOrEmpty(jwtKey))
+        var jwtKey = configuration["Jwt:Key"]
+            ?? configuration["Jwt--Key"]
+            ?? configuration["JWT_SECRET"]
+            ?? configuration["JwtSecret"]
+            ?? configuration["JWT_KEY"]
+            ?? Environment.GetEnvironmentVariable("JWT_SECRET")
+            ?? Environment.GetEnvironmentVariable("JWT_KEY");
+
+        if (string.IsNullOrWhiteSpace(jwtKey))
         {
-            jwtKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? Environment.GetEnvironmentVariable("JWT_KEY");
-        }
-        if (string.IsNullOrEmpty(jwtKey))
-        {
-            jwtKey = "clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!";
+            throw new InvalidOperationException("Chave secreta JWT nao configurada no Azure Key Vault ou ambiente.");
         }
 
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -66,8 +90,8 @@ public class AuthController(IConfiguration configuration) : ControllerBase
                 new Claim(ClaimTypes.Role, "Admin")
             ]),
             Expires = DateTime.UtcNow.AddHours(2),
-            Issuer = configuration["Jwt:Issuer"] ?? "ClyvoVetApi",
-            Audience = configuration["Jwt:Audience"] ?? "ClyvoVetApi",
+            Issuer = configuration["Jwt:Issuer"] ?? "ByteCareApi",
+            Audience = configuration["Jwt:Audience"] ?? "ByteCareClient",
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

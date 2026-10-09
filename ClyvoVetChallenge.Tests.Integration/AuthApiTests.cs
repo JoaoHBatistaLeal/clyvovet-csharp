@@ -59,7 +59,7 @@ public class AuthApiTests
     [Fact]
     public async Task Login_ComCredenciaisValidas_DeveRetornarStatus200OkEToken()
     {
-        var loginRequest = new LoginRequest("admin", "admin123");
+        var loginRequest = new LoginRequest(ClyvoVetWebApplicationFactory.TestUsername, ClyvoVetWebApplicationFactory.TestPassword);
 
         var response = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
 
@@ -72,7 +72,7 @@ public class AuthApiTests
     [Fact]
     public async Task AcessarPerfil_ComTokenValido_DeveRetornarStatus200Ok()
     {
-        var loginRequest = new LoginRequest("admin", "admin123");
+        var loginRequest = new LoginRequest(ClyvoVetWebApplicationFactory.TestUsername, ClyvoVetWebApplicationFactory.TestPassword);
         var loginResponse = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
         var json = await loginResponse.Content.ReadFromJsonAsync<JsonElement>();
         var token = json.GetProperty("token").GetString();

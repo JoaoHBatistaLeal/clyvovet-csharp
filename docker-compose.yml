@@ -5,13 +5,13 @@ services:
     image: postgres:16-alpine
     container_name: postgres-db
     environment:
-      POSTGRES_DB: db_bytecare
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-db_bytecare}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no ambiente ou arquivo .env}
     ports:
       - "${POSTGRES_PORT:-5433}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d db_bytecare"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-db_bytecare}"]
       interval: 3s
       timeout: 3s
       retries: 5
@@ -30,8 +30,10 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - JWT_SECRET=${JWT_SECRET:-bytecare_dev_jwt_secret_key_sprint_3_fiap_2026!}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=db_bytecare;Username=postgres;Password=${POSTGRES_PASSWORD:-postgres}
+      - JWT_SECRET=${JWT_SECRET:?Defina JWT_SECRET com no minimo 32 caracteres no ambiente ou arquivo .env}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-db_bytecare};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD}
+      - AUTH_USERNAME=${AUTH_USERNAME:-admin}
+      - AUTH_PASSWORD=${AUTH_PASSWORD:-}
 
 volumes:
   pgdata:
