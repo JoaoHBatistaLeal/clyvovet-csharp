@@ -20,29 +20,26 @@ AUTH_PASSWORD="${AUTH_PASSWORD:-}"
 KEY_VAULT_NAME="${KEY_VAULT_NAME:-kv-bytecare-564361}"
 
 # ==============================================================================
-# FASE 1 & 2: VALIDACAO RIGOROSA DE SEGURANCA E VARIAVEIS SENSIVEIS
+# VALIDACAO DE VARIAVEIS DE AMBIENTE OBRIGATORIAS
 # ==============================================================================
 if [ -z "$DB_PASSWORD" ] || [ -z "$JWT_SECRET" ]; then
   echo "================================================================================"
-  echo "❌ ERRO DE SEGURANÇA: Credenciais obrigatórias não foram informadas!"
-  echo "Por diretrizes de segurança da Sprint 3 (DevOps & Cloud), valores padrão"
-  echo "e senhas hardcoded foram 100% eliminados deste script e do repositório."
+  echo "Erro: Credenciais obrigatorias nao foram informadas."
+  echo "Por favor, exporte as seguintes variaveis de ambiente antes de executar:"
+  echo "  export DB_PASSWORD='sua_senha_do_postgres'"
+  echo "  export JWT_SECRET='seu_jwt_secret_min_32_chars'"
   echo ""
-  echo "Por favor, exporte as seguintes variáveis de ambiente antes de executar:"
-  echo "  export DB_PASSWORD='sua_senha_forte_do_postgres'"
-  echo "  export JWT_SECRET='seu_secret_jwt_com_pelo_menos_32_caracteres'"
-  echo ""
-  echo "Variáveis opcionais:"
-  echo "  export DB_USER='bytecare_admin' (padrão: bytecare_admin)"
-  echo "  export AUTH_USERNAME='admin' (padrão: admin)"
-  echo "  export AUTH_PASSWORD='sua_senha_de_autenticacao_admin'"
+  echo "Variaveis opcionais:"
+  echo "  export DB_USER='bytecare_admin' (padrao: bytecare_admin)"
+  echo "  export AUTH_USERNAME='admin' (padrao: admin)"
+  echo "  export AUTH_PASSWORD='sua_senha_admin'"
   echo "  export KEY_VAULT_NAME='kv-bytecare-564361'"
   echo "================================================================================"
   exit 1
 fi
 
 if [ ${#JWT_SECRET} -lt 32 ]; then
-  echo "❌ ERRO: A variável JWT_SECRET deve possuir no mínimo 32 caracteres (256 bits)."
+  echo "Erro: A variavel JWT_SECRET deve possuir no minimo 32 caracteres (256 bits)."
   exit 1
 fi
 

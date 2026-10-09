@@ -37,7 +37,7 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Precedencia de Configuracao: Azure Key Vault (se configurado) -> Variaveis de Ambiente -> appsettings.json
+// Precedencia: Azure Key Vault -> Variaveis de Ambiente -> appsettings.json
 var keyVaultUri = builder.Configuration["KEY_VAULT_URI"]
     ?? Environment.GetEnvironmentVariable("KEY_VAULT_URI")
     ?? builder.Configuration["KeyVault:VaultUri"];
@@ -75,7 +75,7 @@ if (!string.IsNullOrEmpty(customPort))
 
 builder.Host.UseSerilog();
 
-// Validacao de conexao com o banco de dados (exige conexao explicita para PostgreSQL)
+// Validacao de conexao com o banco de dados PostgreSQL
 var useSqlite = builder.Configuration.GetValue<bool>("Database:UseSqlite");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? builder.Configuration["ConnectionStrings:DefaultConnection"]
@@ -87,7 +87,6 @@ if (!useSqlite && string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException(
         "A string de conexao com o banco de dados PostgreSQL ('ConnectionStrings:DefaultConnection') nao foi configurada. " +
-        "Por diretrizes de seguranca (DevOps Sprint 3), credenciais padrao/hardcoded foram removidas. " +
         "Configure a conexao via Azure Key Vault ('ConnectionStrings--DefaultConnection') ou variavel de ambiente ('ConnectionStrings__DefaultConnection').");
 }
 
@@ -112,7 +111,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 
-// Validacao e obtencao da chave JWT (remove qualquer fallback fraco/hardcoded)
+// Validacao da chave JWT
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? builder.Configuration["Jwt--Key"]
     ?? builder.Configuration["JWT_SECRET"]
@@ -125,7 +124,6 @@ if (string.IsNullOrWhiteSpace(jwtKey))
 {
     throw new InvalidOperationException(
         "A chave secreta JWT ('Jwt:Key') nao foi configurada. " +
-        "Por diretrizes de seguranca (DevOps Sprint 3), credenciais padrao/hardcoded foram removidas. " +
         "Configure o segredo via Azure Key Vault ('Jwt--Key' ou 'JwtSecret') ou variavel de ambiente ('JWT_SECRET').");
 }
 
