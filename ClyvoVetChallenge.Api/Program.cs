@@ -1,4 +1,6 @@
 using System.Text;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
 using ClyvoVetChallenge.Api.Exceptions;
 using ClyvoVetChallenge.Api.Extensions;
 using ClyvoVetChallenge.Api.Health;
@@ -35,6 +37,36 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Precedencia de Configuracao: Azure Key Vault (se configurado) -> Variaveis de Ambiente -> appsettings.json
+var keyVaultUri = builder.Configuration["KEY_VAULT_URI"]
+    ?? Environment.GetEnvironmentVariable("KEY_VAULT_URI")
+    ?? builder.Configuration["KeyVault:VaultUri"];
+
+if (string.IsNullOrEmpty(keyVaultUri))
+{
+    var keyVaultName = builder.Configuration["KEY_VAULT_NAME"]
+        ?? Environment.GetEnvironmentVariable("KEY_VAULT_NAME");
+    if (!string.IsNullOrEmpty(keyVaultName))
+    {
+        keyVaultUri = $"https://{keyVaultName}.vault.azure.net/";
+    }
+}
+
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    try
+    {
+        builder.Configuration.AddAzureKeyVault(
+            new Uri(keyVaultUri),
+            new DefaultAzureCredential());
+        Log.Information("Azure Key Vault configurado com sucesso a partir de {VaultUri}", keyVaultUri);
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "Nao foi possivel carregar segredos do Azure Key Vault ({VaultUri}). Continuando com variaveis de ambiente.", keyVaultUri);
+    }
+}
+
 var customPort = Environment.GetEnvironmentVariable("PORT");
 if (!string.IsNullOrEmpty(customPort))
 {
@@ -43,7 +75,22 @@ if (!string.IsNullOrEmpty(customPort))
 
 builder.Host.UseSerilog();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+// Validacao de conexao com o banco de dados (exige conexao explicita para PostgreSQL)
+var useSqlite = builder.Configuration.GetValue<bool>("Database:UseSqlite");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? builder.Configuration["ConnectionStrings:DefaultConnection"]
+    ?? builder.Configuration["ConnectionStrings__DefaultConnection"]
+    ?? builder.Configuration["ConnectionStrings--DefaultConnection"]
+    ?? builder.Configuration["DbConnectionString"];
+
+if (!useSqlite && string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "A string de conexao com o banco de dados PostgreSQL ('ConnectionStrings:DefaultConnection') nao foi configurada. " +
+        "Por diretrizes de seguranca (DevOps Sprint 3), credenciais padrao/hardcoded foram removidas. " +
+        "Configure a conexao via Azure Key Vault ('ConnectionStrings--DefaultConnection') ou variavel de ambiente ('ConnectionStrings__DefaultConnection').");
+}
+
 builder.Services.AddDBContext(builder.Configuration);
 builder.Services.AddRepositories();
 builder.Services.AddServices();
@@ -65,16 +112,27 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 
-var jwtKey = builder.Configuration["Jwt:Key"];
-if (string.IsNullOrEmpty(jwtKey))
+// Validacao e obtencao da chave JWT (remove qualquer fallback fraco/hardcoded)
+var jwtKey = builder.Configuration["Jwt:Key"]
+    ?? builder.Configuration["Jwt--Key"]
+    ?? builder.Configuration["JWT_SECRET"]
+    ?? builder.Configuration["JwtSecret"]
+    ?? builder.Configuration["JWT_KEY"]
+    ?? Environment.GetEnvironmentVariable("JWT_SECRET")
+    ?? Environment.GetEnvironmentVariable("JWT_KEY");
+
+if (string.IsNullOrWhiteSpace(jwtKey))
 {
-    jwtKey = builder.Configuration["JWT_SECRET"]
-        ?? Environment.GetEnvironmentVariable("JWT_SECRET")
-        ?? Environment.GetEnvironmentVariable("JWT_KEY");
+    throw new InvalidOperationException(
+        "A chave secreta JWT ('Jwt:Key') nao foi configurada. " +
+        "Por diretrizes de seguranca (DevOps Sprint 3), credenciais padrao/hardcoded foram removidas. " +
+        "Configure o segredo via Azure Key Vault ('Jwt--Key' ou 'JwtSecret') ou variavel de ambiente ('JWT_SECRET').");
 }
-if (string.IsNullOrEmpty(jwtKey))
+
+if (jwtKey.Length < 32)
 {
-    jwtKey = "clyvovet_dev_jwt_secret_key_sprint_3_fiap_2026!";
+    throw new InvalidOperationException(
+        "A chave JWT configurada deve possuir no minimo 32 caracteres (256 bits) para garantir assinatura criptografica segura com HmacSha256.");
 }
 
 builder.Services.AddAuthentication(options =>
@@ -90,8 +148,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "ClyvoVetApi",
-        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "ClyvoVetApi",
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "ByteCareApi",
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? "ByteCareClient",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });

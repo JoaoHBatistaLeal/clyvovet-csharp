@@ -10,15 +10,38 @@ namespace ClyvoVetChallenge.Tests.Integration.Fixtures;
 public class ClyvoVetWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly string _dbFile = $"clyvovet-test-{Guid.NewGuid():N}.db";
+    public const string TestJwtKey = "clyvovet_integration_testing_jwt_secret_key_2026_min32chars!";
+    public const string TestUsername = "admin";
+    public const string TestPassword = "TestSecureAuthPassword2026!";
+
+    public static void EnsureTestEnvironment(string? dbFile = null)
+    {
+        Environment.SetEnvironmentVariable("Database__UseSqlite", "true");
+        if (!string.IsNullOrEmpty(dbFile))
+        {
+            Environment.SetEnvironmentVariable("ConnectionStrings__ClyvoVetSqlite", $"Data Source={dbFile}");
+        }
+        Environment.SetEnvironmentVariable("Jwt__Key", TestJwtKey);
+        Environment.SetEnvironmentVariable("JWT_SECRET", TestJwtKey);
+        Environment.SetEnvironmentVariable("Auth__Username", TestUsername);
+        Environment.SetEnvironmentVariable("Auth__Password", TestPassword);
+        Environment.SetEnvironmentVariable("AUTH_PASSWORD", TestPassword);
+    }
 
     public ClyvoVetWebApplicationFactory()
     {
-        Environment.SetEnvironmentVariable("Database__UseSqlite", "true");
-        Environment.SetEnvironmentVariable("ConnectionStrings__ClyvoVetSqlite", $"Data Source={_dbFile}");
+        EnsureTestEnvironment(_dbFile);
+    }
+
+    protected override void ConfigureClient(HttpClient client)
+    {
+        base.ConfigureClient(client);
+        EnsureTestEnvironment(_dbFile);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        EnsureTestEnvironment(_dbFile);
         builder.UseEnvironment("Development");
 
         builder.ConfigureAppConfiguration((context, config) =>
@@ -26,7 +49,12 @@ public class ClyvoVetWebApplicationFactory : WebApplicationFactory<Program>
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Database:UseSqlite"] = "true",
-                ["ConnectionStrings:ClyvoVetSqlite"] = $"Data Source={_dbFile}"
+                ["ConnectionStrings:ClyvoVetSqlite"] = $"Data Source={_dbFile}",
+                ["Jwt:Key"] = TestJwtKey,
+                ["Jwt:Issuer"] = "ByteCareApi",
+                ["Jwt:Audience"] = "ByteCareClient",
+                ["Auth:Username"] = TestUsername,
+                ["Auth:Password"] = TestPassword
             });
         });
 
