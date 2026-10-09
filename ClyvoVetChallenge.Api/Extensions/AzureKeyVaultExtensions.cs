@@ -4,16 +4,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace Azure.Identity
 {
-    /// <summary>
-    /// Provedor de credenciais padrao para autenticacao em recursos gerenciados do Azure (Managed Identity, Environment, etc.).
-    /// </summary>
     public class DefaultAzureCredential
     {
         private static readonly HttpClient HttpClient = new();
 
         public virtual async Task<string?> GetTokenAsync(string resource = "https://vault.azure.net", CancellationToken cancellationToken = default)
         {
-            // 1. Token direto via variavel de ambiente (se injetado em pipelines ou testes)
             var envToken = Environment.GetEnvironmentVariable("AZURE_KEYVAULT_TOKEN")
                 ?? Environment.GetEnvironmentVariable("AZURE_BEARER_TOKEN");
             if (!string.IsNullOrEmpty(envToken))
@@ -21,7 +17,6 @@ namespace Azure.Identity
                 return envToken;
             }
 
-            // 2. Managed Identity via IMDS / App Service / ACI (se configurado no ambiente Azure)
             var identityEndpoint = Environment.GetEnvironmentVariable("IDENTITY_ENDPOINT");
             var identityHeader = Environment.GetEnvironmentVariable("IDENTITY_HEADER");
             if (!string.IsNullOrEmpty(identityEndpoint) && !string.IsNullOrEmpty(identityHeader))
@@ -43,11 +38,9 @@ namespace Azure.Identity
                 }
                 catch
                 {
-                    // Managed identity nao disponivel neste runtime
                 }
             }
 
-            // 3. Azure IMDS padrao para Virtual Machines / Container Instances
             try
             {
                 using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
@@ -67,7 +60,6 @@ namespace Azure.Identity
             }
             catch
             {
-                // IMDS nao acessivel localmente
             }
 
             return null;
@@ -77,9 +69,6 @@ namespace Azure.Identity
 
 namespace Azure.Extensions.AspNetCore.Configuration.Secrets
 {
-    /// <summary>
-    /// Extensoes para registro do Azure Key Vault como fonte de configuracao nativa.
-    /// </summary>
     public static class AzureKeyVaultConfigurationExtensions
     {
         public static IConfigurationBuilder AddAzureKeyVault(
@@ -131,8 +120,6 @@ namespace Azure.Extensions.AspNetCore.Configuration.Secrets
             }
             catch (Exception ex)
             {
-                // Em caso de indisponibilidade de rede ou ausencia de credenciais locais, nao impede o startup
-                // caso variaveis de ambiente ou configuracoes locais ja fornecam os valores necessarios.
                 Console.WriteLine($"[AzureKeyVault] Aviso: Nao foi possivel carregar segredos diretamente do Azure Key Vault ({_vaultUri.Host}): {ex.Message}");
             }
         }
@@ -142,7 +129,6 @@ namespace Azure.Extensions.AspNetCore.Configuration.Secrets
             var token = await _credential.GetTokenAsync("https://vault.azure.net");
             if (string.IsNullOrEmpty(token))
             {
-                // Sem token de autenticacao Azure disponível
                 return;
             }
 
@@ -199,13 +185,11 @@ namespace Azure.Extensions.AspNetCore.Configuration.Secrets
                 if (doc.RootElement.TryGetProperty("value", out var valProp))
                 {
                     var secretVal = valProp.GetString();
-                    // Extrai nome do secret a partir da URL: https://<vault>.vault.azure.net/secrets/<name>/<version>
                     var uri = new Uri(secretUrl);
                     var segments = uri.AbsolutePath.Trim('/').Split('/');
                     if (segments.Length >= 2 && segments[0] == "secrets")
                     {
                         var secretName = segments[1];
-                        // Converte convencao Azure Key Vault 'Nome--SubNome' para 'Nome:SubNome'
                         var configKey = secretName.Replace("--", ":");
                         if (secretVal != null)
                         {
@@ -216,7 +200,6 @@ namespace Azure.Extensions.AspNetCore.Configuration.Secrets
             }
             catch
             {
-                // Ignora falha de leitura de secret individual
             }
         }
     }

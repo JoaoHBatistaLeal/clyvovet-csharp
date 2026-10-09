@@ -22,7 +22,6 @@ ENV ASPNETCORE_HTTP_PORTS=8080
 
 RUN mkdir -p /app/logs && chown -R app:app /app
 
-# Requisito 8.2: Execução com usuário não-root
 USER app
 
 COPY --chown=app:app --from=build /app/publish .

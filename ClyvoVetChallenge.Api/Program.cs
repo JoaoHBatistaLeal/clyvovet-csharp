@@ -37,7 +37,6 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Precedencia: Azure Key Vault -> Variaveis de Ambiente -> appsettings.json
 var keyVaultUri = builder.Configuration["KEY_VAULT_URI"]
     ?? Environment.GetEnvironmentVariable("KEY_VAULT_URI")
     ?? builder.Configuration["KeyVault:VaultUri"];
@@ -75,7 +74,6 @@ if (!string.IsNullOrEmpty(customPort))
 
 builder.Host.UseSerilog();
 
-// Validacao de conexao com o banco de dados PostgreSQL
 var useSqlite = builder.Configuration.GetValue<bool>("Database:UseSqlite");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? builder.Configuration["ConnectionStrings:DefaultConnection"]
@@ -111,7 +109,6 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
 
-// Validacao da chave JWT
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? builder.Configuration["Jwt--Key"]
     ?? builder.Configuration["JWT_SECRET"]

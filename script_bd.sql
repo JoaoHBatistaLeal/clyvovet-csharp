@@ -313,9 +313,6 @@ COMMIT;
 
 
 
--- ============================================================================
--- COMENTARIOS ESTRUTURAIS NAS TABELAS E COLUNAS CORE (ByteCare API)
--- ============================================================================
 
 COMMENT ON TABLE "TB_DONO" IS 'Tabela responsavel pelo armazenamento dos dados cadastrais dos tutores (donos) dos animais.';
 COMMENT ON COLUMN "TB_DONO"."Id" IS 'Identificador unico do tutor (UUID gerado automaticamente).';
@@ -349,10 +346,6 @@ COMMENT ON TABLE "TB_DIARIO" IS 'Tabela de registros do diario de saude dos anim
 COMMENT ON TABLE "TB_DIARIO_SINTOMA" IS 'Tabela associativa entre diarios de saude e catalogo de sintomas observados.';
 COMMENT ON TABLE "TB_SINTOMA_CATALOGO" IS 'Catalogo padronizado de sintomas clinicos veterinarios.';
 
--- ============================================================================
--- CARGA INICIAL OBRIGATORIA (Tabelas Core: TB_DONO e TB_ANIMAL)
--- Utiliza gen_random_uuid() para chaves primarias compativeis com PostgreSQL 16
--- ============================================================================
 
 DO $$
 DECLARE
@@ -361,7 +354,6 @@ DECLARE
     v_animal1_id uuid := gen_random_uuid();
     v_animal2_id uuid := gen_random_uuid();
 BEGIN
-    -- Insercao de Donos / Tutores Core
     IF NOT EXISTS (SELECT 1 FROM "TB_DONO" WHERE "Cpf" = '12345678901') THEN
         INSERT INTO "TB_DONO" ("Id", "Nome", "Cpf", "Email", "Telefone", "DataNascimento", "Endereco", "CreatedAt", "Active")
         VALUES (v_dono1_id, 'Carlos Eduardo Silva', '12345678901', 'carlos.silva@bytecare.com', '11987654321', '1985-04-12', 'Av. Paulista, 1000 - Bela Vista, Sao Paulo - SP', NOW(), true);
@@ -376,7 +368,6 @@ BEGIN
         SELECT "Id" INTO v_dono2_id FROM "TB_DONO" WHERE "Cpf" = '98765432100';
     END IF;
 
-    -- Insercao de Animais Core vinculados aos tutores correspondentes
     IF NOT EXISTS (SELECT 1 FROM "TB_ANIMAL" WHERE "DonoId" = v_dono1_id AND "Nome" = 'Rex') THEN
         INSERT INTO "TB_ANIMAL" ("Id", "DonoId", "Nome", "Especie", "Raca", "Sexo", "DataNascimento", "Peso", "CreatedAt", "Active")
         VALUES (v_animal1_id, v_dono1_id, 'Rex', 'Canina', 'Golden Retriever', 'Macho', '2021-06-15', 32.50, NOW(), true);

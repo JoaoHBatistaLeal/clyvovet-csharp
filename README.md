@@ -4,7 +4,7 @@ API RESTful desenvolvida em .NET 9.0 para projeto em colaboração com a divisã
 
 ---
 
-## 👥 Integrantes da Equipe (ByteCare)
+## Integrantes da Equipe (ByteCare)
 - **Erik Naoki Miyasato** - RM: 565771
 - **Gustavo Arthur Carvalho Sartori** - RM: 561650
 - **Gutemberg Rocha Silva** - RM: 562267
@@ -13,7 +13,7 @@ API RESTful desenvolvida em .NET 9.0 para projeto em colaboração com a divisã
 
 ---
 
-## 🏗️ Arquitetura da Solução de Software
+## Arquitetura da Solução de Software
 
 A solução foi desenvolvida adotando princípios de Domain-Driven Design (DDD), Clean Architecture e padrão em camadas:
 
@@ -26,7 +26,7 @@ A solução foi desenvolvida adotando princípios de Domain-Driven Design (DDD),
 
 ---
 
-## 📌 Catálogo Completo de Endpoints
+## Catálogo Completo de Endpoints
 
 ### 1. Autenticação e Segurança
 - `POST /api/Auth/login`: Autentica o usuário e retorna o token de acesso JWT.
@@ -109,7 +109,7 @@ A solução foi desenvolvida adotando princípios de Domain-Driven Design (DDD),
 
 ---
 
-## 📋 Exemplos de Payload
+## Exemplos de Payload
 
 ### Autenticação (`POST /api/Auth/login`)
 ```json
@@ -156,7 +156,7 @@ A solução foi desenvolvida adotando princípios de Domain-Driven Design (DDD),
 
 ---
 
-## 📊 Monitoramento e Observabilidade
+## Monitoramento e Observabilidade
 
 A API conta com recursos nativos e estruturados de observabilidade:
 
@@ -204,7 +204,7 @@ O endpoint `/metrics` expõe métricas no padrão Prometheus alimentadas pelo Op
 
 ---
 
-## 🚀 Como Executar o Projeto
+## Como Executar o Projeto
 
 ### Opção 1: Execução Local com SQLite (Desenvolvimento Isolado)
 No ambiente `Development`, a API pode utilizar SQLite local com schema gerenciado em arquivo, sem dependência de banco externo.
@@ -244,7 +244,7 @@ A API ficará acessível na porta `8080`: [http://localhost:8080/swagger](http:/
 
 ---
 
-## 🧪 Guia de Execução de Testes
+## Guia de Execução de Testes
 
 O projeto conta com suíte automatizada de testes seguindo o padrão AAA (Arrange, Act, Assert) e convenções estritas de engenharia de software:
 
@@ -276,9 +276,9 @@ dotnet test --logger "console;verbosity=detailed"
 
 ---
 
-## ☁️ Infraestrutura & Deploy em Nuvem (DevOps & Cloud Computing)
+## Infraestrutura & Deploy em Nuvem (DevOps & Cloud Computing)
 
-### 🏛️ Arquitetura da Solução em Nuvem (Opção 1: ACR + ACI)
+### Arquitetura da Solução em Nuvem (Opção 1: ACR + ACI)
 
 ![Arquitetura Azure](docs/architecture/azure_architecture.png)
 
@@ -293,7 +293,7 @@ dotnet test --logger "console;verbosity=detailed"
 > [!NOTE]
 > O arquivo `script_bd.sql` na raiz do repositório contém o script DDL completo em PostgreSQL com comentários estruturais nas tabelas e carga inicial de dados para a disciplina de DevOps & Cloud Computing.
 
-### 🚀 Deploy Automatizado na Nuvem Azure
+### Deploy Automatizado na Nuvem Azure
 O provisionamento completo da infraestrutura e deploy dos containers é automatizado via script `deploy.sh`:
 
 ```bash
@@ -317,7 +317,7 @@ O script automatiza o fluxo:
 - Criação dos containers ACI `aci-db-bytecare` e `aci-api-bytecare` com injeção segura de variáveis via `--secure-environment-variables`.
 - Verificação de conectividade e validação da integridade via endpoint `/health`.
 
-### 🔒 Execução com Usuário Não-Root
+### Execução com Usuário Não-Root
 O `Dockerfile` da aplicação define a execução sob usuário restrito sem privilégios de root:
 ```dockerfile
 USER app
@@ -328,7 +328,7 @@ az container exec --resource-group rg-bytecare --name aci-api-bytecare --exec-co
 # uid=1654(app) gid=1654(app) groups=1654(app)
 ```
 
-### 📋 Evidência das Operações de CRUD no Banco de Dados
+### Evidência das Operações de CRUD no Banco de Dados
 Abaixo estão os exemplos das operações de CRUD executadas via HTTP contra a API e validadas no banco de dados relacional PostgreSQL:
 
 #### 1. Inserção (POST /api/Dono)
@@ -379,7 +379,7 @@ curl -s http://api-bytecare.brazilsouth.azurecontainer.io:8080/health
 ```
 Retorna diagnóstico em JSON confirmando status `Healthy` para o banco de dados e dependências externas.
 
-### 🧹 Descomissionamento dos Recursos
+### Descomissionamento dos Recursos
 Para desalocar os recursos em nuvem após a conclusão das avaliações:
 ```bash
 az group delete --name rg-bytecare --yes --no-wait

@@ -19,9 +19,6 @@ AUTH_USERNAME="${AUTH_USERNAME:-admin}"
 AUTH_PASSWORD="${AUTH_PASSWORD:-}"
 KEY_VAULT_NAME="${KEY_VAULT_NAME:-kv-bytecare-564361}"
 
-# ==============================================================================
-# VALIDACAO DE VARIAVEIS DE AMBIENTE OBRIGATORIAS
-# ==============================================================================
 if [ -z "$DB_PASSWORD" ] || [ -z "$JWT_SECRET" ]; then
   echo "================================================================================"
   echo "Erro: Credenciais obrigatorias nao foram informadas."
@@ -43,9 +40,6 @@ if [ ${#JWT_SECRET} -lt 32 ]; then
   exit 1
 fi
 
-# ==============================================================================
-# DEFINICAO DO CONTEXTO DA SUBSCRIPTION AZURE OBRIGATORIA
-# ==============================================================================
 echo "==> Definindo contexto da subscription Azure: $REQUIRED_SUBSCRIPTION..."
 if az account set --subscription "$REQUIRED_SUBSCRIPTION" 2>/dev/null; then
   echo "Assinatura ativa: $REQUIRED_SUBSCRIPTION"
@@ -54,17 +48,11 @@ else
   echo "Certifique-se de estar autenticado com permissao via 'az login'."
 fi
 
-# ==============================================================================
-# GRUPO DE RECURSOS
-# ==============================================================================
 echo "==> Criando/verificando Resource Group: $RESOURCE_GROUP ($LOCATION)..."
 az group create \
   --name "$RESOURCE_GROUP" \
   --location "$LOCATION"
 
-# ==============================================================================
-# AZURE KEY VAULT (PROVISIONAMENTO E ARMAZENAMENTO SEGURO DE SECRETS)
-# ==============================================================================
 DB_HOST="db-bytecare.${LOCATION}.azurecontainer.io"
 CONNECTION_STRING="Host=${DB_HOST};Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}"
 
@@ -87,9 +75,6 @@ if [ -n "$AUTH_PASSWORD" ]; then
   az keyvault secret set --vault-name "$KEY_VAULT_NAME" --name "Auth--Password" --value "$AUTH_PASSWORD" >/dev/null 2>&1 || true
 fi
 
-# ==============================================================================
-# AZURE CONTAINER REGISTRY (ACR)
-# ==============================================================================
 echo "==> Criando/verificando Azure Container Registry: $ACR_NAME..."
 az acr create \
   --resource-group "$RESOURCE_GROUP" \
@@ -110,9 +95,6 @@ az acr import \
   --image postgres-bytecare:v1 \
   --force
 
-# ==============================================================================
-# AZURE CONTAINER INSTANCES (ACI) - POSTGRESQL 16
-# ==============================================================================
 DB_STATE=$(az container show --resource-group "$RESOURCE_GROUP" --name aci-db-bytecare --query "instanceView.state" -o tsv 2>/dev/null || echo "NotFound")
 if [ "$DB_STATE" != "Running" ]; then
   echo "==> Criando container aci-db-bytecare com --secure-environment-variables..."
@@ -147,9 +129,6 @@ for i in $(seq 1 30); do
   sleep 4
 done
 
-# ==============================================================================
-# BUILD E PUSH DA IMAGEM DA API (.NET 9 / NÃO-ROOT)
-# ==============================================================================
 echo "==> Construindo e publicando imagem da API no ACR..."
 docker build -t "${ACR_LOGIN_SERVER}/api-bytecare:v1" .
 docker push "${ACR_LOGIN_SERVER}/api-bytecare:v1"
@@ -159,9 +138,6 @@ if az container show --resource-group "$RESOURCE_GROUP" --name aci-api-bytecare 
   az container delete --resource-group "$RESOURCE_GROUP" --name aci-api-bytecare --yes >/dev/null 2>&1 || true
 fi
 
-# ==============================================================================
-# AZURE CONTAINER INSTANCES (ACI) - API .NET COM VARIAVEIS SEGURAS
-# ==============================================================================
 echo "==> Provisionando container aci-api-bytecare com --secure-environment-variables..."
 az container create \
   --resource-group "$RESOURCE_GROUP" \
