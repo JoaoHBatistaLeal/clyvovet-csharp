@@ -81,6 +81,29 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
     ?? builder.Configuration["ConnectionStrings--DefaultConnection"]
     ?? builder.Configuration["DbConnectionString"];
 
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    var dbHost = builder.Configuration["DB_HOST"] ?? Environment.GetEnvironmentVariable("DB_HOST");
+    var dbPort = builder.Configuration["DB_PORT"] ?? Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+    var dbName = builder.Configuration["DB_NAME"] ?? Environment.GetEnvironmentVariable("DB_NAME") ?? "db_bytecare";
+    var dbUser = builder.Configuration["DB_USER"] ?? Environment.GetEnvironmentVariable("DB_USER") ?? "postgres";
+    var dbPass = builder.Configuration["DB_PASSWORD"] ?? Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+    if (!string.IsNullOrWhiteSpace(dbHost) && !string.IsNullOrWhiteSpace(dbPass))
+    {
+        var csBuilder = new System.Data.Common.DbConnectionStringBuilder
+        {
+            ["Host"] = dbHost,
+            ["Port"] = dbPort,
+            ["Database"] = dbName,
+            ["Username"] = dbUser,
+            ["Password"] = dbPass
+        };
+        connectionString = csBuilder.ConnectionString;
+        builder.Configuration["ConnectionStrings:DefaultConnection"] = connectionString;
+    }
+}
+
 if (!useSqlite && string.IsNullOrWhiteSpace(connectionString))
 {
     throw new InvalidOperationException(

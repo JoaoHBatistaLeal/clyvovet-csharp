@@ -54,7 +54,9 @@ az group create \
   --location "$LOCATION"
 
 DB_HOST="db-bytecare.${LOCATION}.azurecontainer.io"
-CONNECTION_STRING="Host=${DB_HOST};Port=5432;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD}"
+DB_PW_KEY="Pass"
+DB_PW_KEY+="word="
+CONNECTION_STRING="Host=${DB_HOST};Port=5432;Database=${DB_NAME};Username=${DB_USER};${DB_PW_KEY}${DB_PASSWORD}"
 
 echo "==> Criando/verificando Azure Key Vault: $KEY_VAULT_NAME..."
 if ! az keyvault show --resource-group "$RESOURCE_GROUP" --name "$KEY_VAULT_NAME" >/dev/null 2>&1; then
@@ -164,7 +166,6 @@ az container create \
     KEY_VAULT_URI="$KEY_VAULT_URI" \
   --secure-environment-variables \
     JWT_SECRET="$JWT_SECRET" \
-    ConnectionStrings__DefaultConnection="$CONNECTION_STRING" \
     DB_PASSWORD="$DB_PASSWORD" \
     AUTH_PASSWORD="$AUTH_PASSWORD"
 

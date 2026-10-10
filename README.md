@@ -301,8 +301,8 @@ O provisionamento completo da infraestrutura e deploy dos containers é automati
 az account set --subscription "2026-2TDSPJ-JOAO-H-BATISTA-LEAL-RM564361"
 
 # 2. Exportar credenciais obrigatórias para a sessão
-export DB_PASSWORD="sua_senha_forte_do_postgres"
-export JWT_SECRET="sua_chave_jwt_secreta_com_minimo_32_caracteres"
+export DB_PASSWORD="<sua_senha_forte_do_postgres>"
+export JWT_SECRET="<sua_chave_jwt_secreta_com_minimo_32_caracteres>"
 
 # 3. Executar o provisionamento e deploy
 chmod +x deploy.sh
