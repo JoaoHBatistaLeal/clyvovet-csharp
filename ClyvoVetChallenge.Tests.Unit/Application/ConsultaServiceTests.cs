@@ -154,4 +154,21 @@ public class ConsultaServiceTests
         Assert.False(resultado);
         _repositoryMock.Verify(r => r.Delete(It.IsAny<Consulta>()), Times.Never);
     }
+    [Fact]
+    public async Task GetPagedAsync_ComFiltrosValidos_DeveRetornarRespostaPaginada()
+    {
+        var consultas = new List<Consulta>
+        {
+            new(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), new DateOnly(2026, 6, 1), new TimeOnly(10, 0), "Vacina", "Presencial")
+        };
+        var parameters = new ConsultaQueryParameters { PageNumber = 1, PageSize = 10, Tipo = "Presencial" };
+        _repositoryMock.Setup(r => r.GetPagedAsync(parameters, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((consultas, 1));
+
+        var resultado = await _service.GetPagedAsync(parameters);
+
+        Assert.NotNull(resultado);
+        Assert.Single(resultado.Items);
+        Assert.Equal(1, resultado.TotalCount);
+    }
 }

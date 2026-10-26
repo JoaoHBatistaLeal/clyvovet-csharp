@@ -217,5 +217,39 @@ public class AnimalApiTests
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
-}
+    [Fact]
+    public async Task ObterAnimaisPaginados_ComParametros_DeveRetornarStatus200OkELinksHateoas()
+    {
+        var donoId = await CriarDonoValidoAsync();
+        var request = new AnimalRequest
+        {
+            DonoId = donoId,
+            Nome = "Maximus",
+            Especie = "Canina",
+            Raca = "Pastor",
+            Sexo = "Macho",
+            DataNascimento = new DateOnly(2021, 1, 1),
+            Peso = 30.0m
+        };
+        await _client.PostAsJsonAsync("/api/Animal", request);
 
+        var response = await _client.GetAsync("/api/Animal/paged?pageNumber=1&pageSize=5");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        Assert.True(json.TryGetProperty("items", out var itemsProp));
+        Assert.True(json.TryGetProperty("links", out var linksProp));
+        Assert.True(linksProp.GetArrayLength() > 0);
+    }
+
+    [Fact]
+    public async Task ObterAnimais_SemAutenticacao_DeveRetornarStatus401Unauthorized()
+    {
+        using var factory = new ClyvoVetWebApplicationFactory();
+        var unauthenticatedClient = factory.CreateClient();
+
+        var response = await unauthenticatedClient.GetAsync("/api/Animal");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+}

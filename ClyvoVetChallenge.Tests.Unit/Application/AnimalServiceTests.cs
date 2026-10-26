@@ -135,4 +135,22 @@ public class AnimalServiceTests
         Assert.False(resultado);
         _repositoryMock.Verify(r => r.Delete(It.IsAny<Animal>()), Times.Never);
     }
+    [Fact]
+    public async Task GetPagedAsync_ComFiltrosValidos_DeveRetornarRespostaPaginada()
+    {
+        var animais = new List<Animal>
+        {
+            new(Guid.NewGuid(), "Rex", "Canina", "Labrador", "Macho", new DateOnly(2021, 5, 10), 25.5m)
+        };
+        var parameters = new AnimalQueryParameters { PageNumber = 1, PageSize = 10, Nome = "Rex" };
+        _repositoryMock.Setup(r => r.GetPagedAsync(parameters, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((animais, 1));
+
+        var resultado = await _service.GetPagedAsync(parameters);
+
+        Assert.NotNull(resultado);
+        Assert.Single(resultado.Items);
+        Assert.Equal(1, resultado.TotalCount);
+        Assert.Equal("Rex", resultado.Items.First().Nome);
+    }
 }
