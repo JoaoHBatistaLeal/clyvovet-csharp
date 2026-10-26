@@ -17,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPrescricaoService, PrescricaoService>();
         services.AddScoped<ISintomaService, SintomaService>();
         services.AddScoped<IVeterinarioService, VeterinarioService>();
+        services.AddScoped<IRecomendacaoIaService, RecomendacaoIaService>();
 
         return services;
     }

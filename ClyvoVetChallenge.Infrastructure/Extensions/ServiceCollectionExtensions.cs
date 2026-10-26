@@ -1,4 +1,6 @@
 using ClyvoVetChallenge.Application.Interfaces.Repositories;
+using ClyvoVetChallenge.Infrastructure.Mongo;
+using ClyvoVetChallenge.Infrastructure.Mongo.Repositories;
 using ClyvoVetChallenge.Infrastructure.Persistence;
 using ClyvoVetChallenge.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +34,10 @@ public static class ServiceCollectionExtensions
                 }
             });
         }
+
+        services.Configure<MongoDbSettings>(configuration.GetSection(MongoDbSettings.SectionName));
+        services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
+        services.AddScoped<IRecomendacaoIaRepository, RecomendacaoIaRepository>();
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IAnimalRepository, AnimalRepository>();
