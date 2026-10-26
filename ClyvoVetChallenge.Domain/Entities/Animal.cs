@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using ClyvoVetChallenge.Domain.Commons;
 
 namespace ClyvoVetChallenge.Domain.Entities;
@@ -14,6 +14,7 @@ public class Animal : BaseEntity
     public decimal Peso { get; private set; }
 
     public Dono Dono { get; private set; }
+    public ICollection<Consulta> Consultas { get; private set; } = new List<Consulta>();
 
     public Animal(Guid donoId, string nome, string especie, string raca, string sexo, DateOnly dataNascimento, decimal peso)
     {

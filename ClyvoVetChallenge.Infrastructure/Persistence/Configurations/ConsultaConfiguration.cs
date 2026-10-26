@@ -26,7 +26,7 @@ public class ConsultaConfiguration : IEntityTypeConfiguration<Consulta>
         builder.Property(x => x.Tipo).IsRequired().HasMaxLength(50);
 
         builder.HasOne(x => x.Animal)
-            .WithMany()
+            .WithMany(x => x.Consultas)
             .HasForeignKey(x => x.AnimalId)
             .OnDelete(DeleteBehavior.Restrict);
 

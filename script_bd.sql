@@ -1,4 +1,4 @@
-﻿CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
     "MigrationId" character varying(150) NOT NULL,
     "ProductVersion" character varying(32) NOT NULL,
     CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
@@ -378,3 +378,32 @@ BEGIN
         VALUES (v_animal2_id, v_dono2_id, 'Mia', 'Felina', 'Siames', 'Femea', '2022-03-20', 4.10, NOW(), true);
     END IF;
 END $$;
+
+
+CREATE OR REPLACE PROCEDURE sp_cancelar_consultas_antigas(p_dias integer)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE "TB_CONSULTA"
+    SET "Status" = 'Cancelada'
+    WHERE "Status" = 'Agendada'
+      AND "DataConsulta" < CURRENT_DATE - p_dias;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_obter_resumo_consultas_animal(p_animal_id uuid)
+RETURNS TABLE (
+    "TotalConsultas" bigint,
+    "UltimaConsulta" date,
+    "StatusUltimaConsulta" varchar
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        COUNT(*)::bigint AS "TotalConsultas",
+        MAX(c."DataConsulta") AS "UltimaConsulta",
+        COALESCE((SELECT c2."Status"::varchar FROM "TB_CONSULTA" c2 WHERE c2."AnimalId" = p_animal_id ORDER BY c2."DataConsulta" DESC, c2."HoraConsulta" DESC LIMIT 1), 'Nenhuma')::varchar AS "StatusUltimaConsulta"
+    FROM "TB_CONSULTA" c
+    WHERE c."AnimalId" = p_animal_id;
+END;
+$$ LANGUAGE plpgsql;
