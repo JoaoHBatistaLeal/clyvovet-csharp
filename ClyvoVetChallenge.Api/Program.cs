@@ -5,6 +5,8 @@ using ClyvoVetChallenge.Api.Exceptions;
 using ClyvoVetChallenge.Api.Extensions;
 using ClyvoVetChallenge.Api.Health;
 using ClyvoVetChallenge.Api.Middlewares;
+using ClyvoVetChallenge.Application.Extensions;
+using ClyvoVetChallenge.Infrastructure.Extensions;
 using ClyvoVetChallenge.Infrastructure.Persistence;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -111,9 +113,8 @@ if (!useSqlite && string.IsNullOrWhiteSpace(connectionString))
         "Configure a conexao via Azure Key Vault ('ConnectionStrings--DefaultConnection') ou variavel de ambiente ('ConnectionStrings__DefaultConnection').");
 }
 
-builder.Services.AddDBContext(builder.Configuration);
-builder.Services.AddRepositories();
-builder.Services.AddServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices();
 
 builder.Services.AddCors(options =>
 {
