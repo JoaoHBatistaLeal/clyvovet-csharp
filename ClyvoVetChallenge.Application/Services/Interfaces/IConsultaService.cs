@@ -1,4 +1,5 @@
-﻿using ClyvoVetChallenge.Application.DTOs;
+using ClyvoVetChallenge.Application.DTOs;
+using ClyvoVetChallenge.Application.DTOs.Common;
 
 namespace ClyvoVetChallenge.Application.Services.Interfaces;
 
@@ -10,4 +11,5 @@ public interface IConsultaService
     ConsultaResponse Create(ConsultaRequest request);
     ConsultaResponse? UpdateResultado(Guid id, ConsultaResultadoRequest request);
     bool Delete(Guid id);
+    Task<PagedResponse<ConsultaResponse>> GetPagedAsync(ConsultaQueryParameters parameters, CancellationToken cancellationToken = default);
 }

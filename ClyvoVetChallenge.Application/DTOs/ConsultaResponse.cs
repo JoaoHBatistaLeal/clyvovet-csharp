@@ -1,4 +1,5 @@
 using System;
+using ClyvoVetChallenge.Application.DTOs.Common;
 using ClyvoVetChallenge.Domain.Entities;
 
 namespace ClyvoVetChallenge.Application.DTOs;
@@ -16,6 +17,7 @@ public class ConsultaResponse
     public string? Observacoes { get; set; }
     public string Status { get; set; }
     public string Tipo { get; set; }
+    public List<LinkDto> Links { get; set; } = [];
 
     public ConsultaResponse() { }
 

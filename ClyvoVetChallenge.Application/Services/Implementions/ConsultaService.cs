@@ -1,4 +1,5 @@
-﻿using ClyvoVetChallenge.Application.DTOs;
+using ClyvoVetChallenge.Application.DTOs;
+using ClyvoVetChallenge.Application.DTOs.Common;
 using ClyvoVetChallenge.Application.Interfaces.Repositories;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
@@ -49,5 +50,12 @@ public class ConsultaService(IConsultaRepository consultaRepository) : IConsulta
         consultaRepository.Delete(consulta);
         consultaRepository.SaveChanges();
         return true;
+    }
+
+    public async Task<PagedResponse<ConsultaResponse>> GetPagedAsync(ConsultaQueryParameters parameters, CancellationToken cancellationToken = default)
+    {
+        var (items, totalCount) = await consultaRepository.GetPagedAsync(parameters, cancellationToken);
+        var mappedItems = items.Select(x => new ConsultaResponse(x)).ToList();
+        return new PagedResponse<ConsultaResponse>(mappedItems, parameters.PageNumber, parameters.PageSize, totalCount);
     }
 }
