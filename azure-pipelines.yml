@@ -1,0 +1,55 @@
+trigger:
+  branches:
+    include:
+      - main
+      - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetVersion: '9.0.x'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Instalar SDK .NET 9'
+  inputs:
+    packageType: 'sdk'
+    version: $(dotnetVersion)
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restaurar dependencias do projeto'
+  inputs:
+    command: 'restore'
+    projects: '**/*.sln'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Compilar solucao em Release'
+  inputs:
+    command: 'build'
+    projects: '**/*.sln'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Executar testes com cobertura de codigo'
+  inputs:
+    command: 'test'
+    projects: '**/*Tests*/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-build --collect:"XPlat Code Coverage"'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publicar artefato da API'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
+    zipAfterPublish: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publicar artefato drop para esteira de CD'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
