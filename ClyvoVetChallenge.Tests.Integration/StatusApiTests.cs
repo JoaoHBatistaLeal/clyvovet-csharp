@@ -29,4 +29,20 @@ public class StatusApiTests
         Assert.True(json.TryGetProperty("status", out var statusProp));
         Assert.Equal("Online", statusProp.GetString());
     }
+
+    [Fact]
+    public async Task SwaggerJson_QuandoChamado_DeveRetornarEsquemaOpenApiValido()
+    {
+        var response = await _client.GetAsync("/swagger/v1/swagger.json");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var content = await response.Content.ReadAsStringAsync();
+        Assert.Contains("openapi", content);
+
+        var docsDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../docs"));
+        if (Directory.Exists(docsDir))
+        {
+            await File.WriteAllTextAsync(Path.Combine(docsDir, "swagger.json"), content);
+        }
+    }
 }

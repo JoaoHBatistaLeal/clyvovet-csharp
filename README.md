@@ -1,386 +1,331 @@
 # Clyvo Vet API (ByteCare)
 
-API RESTful desenvolvida em .NET 9.0 para projeto em colaboração com a divisão de medicina veterinária da empresa Clyvo, concebida para atender aos requisitos de arquitetura de software, qualidade e infraestrutura em nuvem Microsoft Azure.
+API RESTful corporativa desenvolvida em .NET 9.0 para suporte a medicina veterinaria preventiva e gestao clinica integrada para a Clyvo Vet, estruturada com Clean Architecture, persistencia poliglota (PostgreSQL e MongoDB), inteligencia artificial para recomendacao clinica, observabilidade com OpenTelemetry e esteira automatizada de CI/CD no Azure DevOps.
 
 ---
 
-## Integrantes da Equipe (ByteCare)
-- **Erik Naoki Miyasato** - RM: 565771
-- **Gustavo Arthur Carvalho Sartori** - RM: 561650
-- **Gutemberg Rocha Silva** - RM: 562267
-- **João Henrique Batista Leal** - RM: 564361
-- **Juliana da Silva Stigliani** - RM: 561171
+## 1. Integrantes do Grupo (ByteCare)
+
+- **Erik Naoki Miyasato** - RM: 565771 - Turma: 2TDSPJ
+- **Gustavo Arthur Carvalho Sartori** - RM: 561650 - Turma: 2TDSPJ
+- **Gutemberg Rocha Silva** - RM: 562267 - Turma: 2TDSPJ
+- **João Henrique Batista Leal** - RM: 564361 - Turma: 2TDSPJ
+- **Juliana da Silva Stigliani** - RM: 561171 - Turma: 2TDSPJ
 
 ---
 
-## Arquitetura da Solução de Software
+## 2. Visao Geral da Solucao e Beneficios para o Negocio
 
-A solução foi desenvolvida adotando princípios de Domain-Driven Design (DDD), Clean Architecture e padrão em camadas:
+A solucao Clyvo Vet aborda a fragmentacao do historico clinico e a falta de padronizacao no acompanhamento de saude preventiva dos animais de estimacao. A plataforma unifica a gestao de tutores, pacientes, equipes veterinarias e clinicas parceiras, agregando suporte a decisao clinica por Inteligencia Artificial e persistencia poliglota para analise estruturada e semiestruturada.
 
-- **ClyvoVetChallenge.Domain:** Entidades de domínio com encapsulamento, enums de status e regras fundamentais do negócio veterinário.
-- **ClyvoVetChallenge.Application:** DTOs de requisição e resposta, contratos de interfaces de serviços e repositórios, validações de entrada e orquestração das regras de aplicação.
-- **ClyvoVetChallenge.Infrastructure:** Persistência via Entity Framework Core com mapeamento Fluent API, suporte a PostgreSQL 16 (produção e nuvem ACI) e SQLite para testes locais isolados, repositórios concretos e migrações versionadas.
-- **ClyvoVetChallenge.Api:** Camada de apresentação RESTful com documentação Swagger/OpenAPI, autenticação JWT Bearer, tratamento global de erros no padrão RFC 9110 (ProblemDetails), logging estruturado Serilog, middleware de Correlation ID e instrumentação OpenTelemetry.
-- **ClyvoVetChallenge.Tests.Unit:** 92 testes unitários com xUnit e Moq para isolamento rigoroso de regras de negócio e serviços.
-- **ClyvoVetChallenge.Tests.Integration:** 31 testes de integração com `WebApplicationFactory` validando o ciclo HTTP completo, autorização, validação estrita de inicialização e códigos de status.
+### Beneficios Praticos:
+- **Centralizacao do Prontuario Veterinario:** Registro unificado de consultas, evolucao de sintomas e prescricoes em banco relacional de alta confiabilidade.
+- **Suporte a Decisao Clinica com IA:** Triagem rapida baseada em sintomas relatados, categorizando niveis de urgencia (Baixa, Media, Alta, Emergencia) e sugerindo condutas imediatas.
+- **Auditoria e Persistencia NoSQL:** Historico de analises de IA e logs de auditoria gravados em MongoDB sem sobrecarregar as tabelas transacionais relacionais.
+- **Navegabilidade Hipermidia (HATEOAS):** Endpoints nivel 3 do Modelo de Richardson com links autodocumentados para acoes de consulta, atualizacao e remocao.
+- **Esteira de CI/CD Resiliente:** Integracao continua no Azure DevOps com compilacao automatizada, execucao de testes unitarios e de integracao isolados de conexoes externas e geracao de artefato imutavel.
 
----
-
-## Catálogo Completo de Endpoints
-
-### 1. Autenticação e Segurança
-- `POST /api/Auth/login`: Autentica o usuário e retorna o token de acesso JWT.
-- `GET /api/Auth/perfil`: Retorna os dados do perfil autenticado (Requer `Authorization: Bearer <token>`).
-
-### 2. Animais (`/api/Animal`)
-- `GET /api/Animal`: Lista todos os animais cadastrados.
-- `GET /api/Animal/{id}`: Busca um animal específico pelo ID.
-- `POST /api/Animal`: Cadastra um novo animal (Valida que a data de nascimento não pode ser futura; retorna HTTP 422 em caso de violação).
-- `PUT /api/Animal/{id}`: Atualiza os dados de um animal existente.
-- `DELETE /api/Animal/{id}`: Remove um animal do sistema.
-
-### 3. Clínicas Veterinárias (`/api/Clinica`)
-- `GET /api/Clinica`: Lista todas as clínicas cadastradas.
-- `GET /api/Clinica/{id}`: Busca uma clínica específica pelo ID.
-- `POST /api/Clinica`: Cadastra uma nova clínica (validação de CNPJ).
-- `PUT /api/Clinica/{id}`: Atualiza os dados de uma clínica existente.
-- `DELETE /api/Clinica/{id}`: Remove uma clínica do sistema.
-
-### 4. Consultas Veterinárias (`/api/Consulta`)
-- `GET /api/Consulta`: Lista todas as consultas cadastradas.
-- `GET /api/Consulta/{id}`: Busca uma consulta específica pelo ID.
-- `GET /api/Consulta/animal/{animalId}`: Lista todas as consultas vinculadas a um animal.
-- `POST /api/Consulta`: Agenda uma nova consulta vinculando animal, veterinário e clínica.
-- `PUT /api/Consulta/{id}/resultado`: Registra diagnóstico, observações e altera o status da consulta.
-- `DELETE /api/Consulta/{id}`: Cancela ou remove uma consulta do sistema.
-
-### 5. Diários de Sintomas (`/api/Diario`)
-- `GET /api/Diario`: Lista todos os registros de diário cadastrados.
-- `GET /api/Diario/{id}`: Busca um registro de diário pelo ID.
-- `GET /api/Diario/animal/{animalId}`: Lista todos os diários de um animal específico.
-- `POST /api/Diario`: Cria um novo registro de diário de saúde para o animal.
-- `PUT /api/Diario/{id}`: Atualiza anotações do diário.
-- `DELETE /api/Diario/{id}`: Remove um registro de diário.
-- `POST /api/Diario/{diarioId}/sintomas`: Adiciona um sintoma observado com nível de intensidade ao diário.
-- `DELETE /api/Diario/{diarioId}/sintomas/{sintomaId}`: Remove um sintoma associado ao diário.
-
-### 6. Tutores / Donos (`/api/Dono`)
-- `GET /api/Dono`: Lista todos os donos cadastrados.
-- `GET /api/Dono/{id}`: Busca um dono específico pelo ID.
-- `POST /api/Dono`: Cadastra um novo dono (validação de CPF único).
-- `PUT /api/Dono/{id}`: Atualiza informações de contato e endereço do dono.
-- `DELETE /api/Dono/{id}`: Remove um dono do sistema.
-
-### 7. Históricos Médicos (`/api/Historico`)
-- `GET /api/Historico`: Lista todos os eventos de histórico médico.
-- `GET /api/Historico/{id}`: Busca um registro de histórico pelo ID.
-- `GET /api/Historico/animal/{animalId}`: Lista os registros médicos de um animal específico.
-- `POST /api/Historico`: Registra um novo evento histórico para o animal.
-- `PUT /api/Historico/{id}`: Atualiza descrição e resultados do histórico.
-- `DELETE /api/Historico/{id}`: Remove um evento histórico.
-
-### 8. Prescrições (`/api/Prescricao`)
-- `GET /api/Prescricao`: Lista todas as prescrições cadastradas.
-- `GET /api/Prescricao/{id}`: Busca uma prescrição específica pelo ID.
-- `GET /api/Prescricao/consulta/{consultaId}`: Lista prescrições vinculadas a uma consulta.
-- `POST /api/Prescricao`: Emite uma nova prescrição com medicamento, dosagem e duração.
-- `PUT /api/Prescricao/{id}`: Atualiza posologia e observações da prescrição.
-- `DELETE /api/Prescricao/{id}`: Remove uma prescrição.
-
-### 9. Catálogo de Sintomas (`/api/Sintoma`)
-- `GET /api/Sintoma`: Lista os tipos de sintomas pré-cadastrados.
-- `GET /api/Sintoma/{id}`: Busca um tipo de sintoma pelo ID.
-- `POST /api/Sintoma`: Cadastra um novo sintoma no catálogo.
-- `PUT /api/Sintoma/{id}`: Atualiza nome e descrição do sintoma.
-- `DELETE /api/Sintoma/{id}`: Remove um sintoma do catálogo.
-
-### 10. Médicos Veterinários (`/api/Veterinario`)
-- `GET /api/Veterinario`: Lista todos os veterinários cadastrados.
-- `GET /api/Veterinario/{id}`: Busca um veterinário específico pelo ID.
-- `POST /api/Veterinario`: Cadastra um novo veterinário (validação de CRMV).
-- `PUT /api/Veterinario/{id}/contato`: Atualiza dados de contato (telefone e email) do veterinário.
-- `DELETE /api/Veterinario/{id}`: Remove um veterinário do sistema.
-
-### 11. Monitoramento e Observabilidade
-- `GET /health`: Diagnóstico abrangente da aplicação com validação do banco de dados e serviços externos.
-- `GET /health/ready`: Probe de prontidão (Readiness) filtrando dependências essenciais.
-- `GET /health/live`: Probe de vivacidade (Liveness) leve para orquestradores.
-- `GET /metrics`: Métricas no formato Prometheus exportadas via OpenTelemetry.
+### Stack Tecnologica Completa:
+- **Linguagem e Framework:** C# 13, .NET 9.0 SDK
+- **Persistencia Relacional:** Entity Framework Core 9.0, PostgreSQL 16 Alpine, SQLite (testes isolados)
+- **Persistencia NoSQL:** MongoDB 7.0 (driver oficial MongoDB.Driver 3.12.0)
+- **Seguranca e Criptografia:** ASP.NET Core Authentication JWT Bearer, HMAC-SHA256, Azure Key Vault
+- **Observabilidade:** Serilog (Console e Rolling File), OpenTelemetry Tracing e Metrics, Prometheus Exporter, Health Checks nativos do ASP.NET Core
+- **Testes Automatizados:** xUnit 2.9, Moq 4.20, Microsoft.AspNetCore.Mvc.Testing (WebApplicationFactory)
+- **Containerizacao:** Docker multi-stage build com usuario restrito nao-root (`USER app`)
+- **Pipeline e Nuvem:** Azure Pipelines (YAML), Azure Container Registry (ACR), Azure Container Instances (ACI) / Azure Web App
 
 ---
 
-## Exemplos de Payload
+## 3. Arquitetura da Solucao e Fluxo CI/CD
 
-### Autenticação (`POST /api/Auth/login`)
+### Diagrama de Arquitetura em Nuvem
+
+![Arquitetura da Solucao em Nuvem](docs/architecture/azure_architecture.png)
+
+### Fluxo Integrado de CI/CD (Numerado):
+1. **Desenvolvedor:** Realiza codificacao local, executa testes locais (`dotnet test`) e envia os commits com mensagens semanticas para as branches `main` ou `master` no repositorio Git.
+2. **Azure Pipelines (Gatilho de CI):** O push na branch principal dispara automaticamente a pipeline declarada no arquivo `azure-pipelines.yml`.
+3. **Restauracao e Build (CI):** O agente Microsoft instala o .NET 9 SDK, restaura as dependencias NuGet e realiza o build da solucao com a flag `--configuration Release`.
+4. **Execucao de Testes Automatizados (CI):** Os 138 testes (104 unitarios e 34 de integracao) sao executados com coleta de cobertura (`XPlat Code Coverage`). Como os testes de integracao utilizam SQLite em memoria e mock NoSQL, o estagio conclui em segundos sem depender de redes externas ou bancos pre-existentes no agente.
+5. **Publicacao do Artefato (CI):** A API e compilada em formato de artefato imutavel (`drop`) e disponibilizada para a esteira de CD.
+6. **Entrega Continua (CD):** A pipeline de CD provisiona a infraestrutura no Microsoft Azure ou realiza a atualizacao da imagem de container no Azure Container Registry (ACR).
+7. **Deploy em Ambiente Cloud (ACI / Web App):** A aplicacao entra no ar sob o usuario sem privilegios de root (`USER app`), consumindo segredos injetados pelo Azure Key Vault ou `--secure-environment-variables`.
+8. **Usuario Final / Veterinario:** Acessa a API via Swagger público ou aplicacao cliente atraves do endereco FQDN exposto pelo Azure.
+
+---
+
+## 4. Estrutura da Clean Architecture e SOLID
+
+A solucao adota os padroes de Clean Architecture com estrita inversao de controle:
+
+- **ClyvoVetChallenge.Domain:** Nucleo da aplicacao sem qualquer dependencia de pacotes externos ou infraestrutura. Contem as entidades fundamentais (`Animal`, `Clinica`, `Consulta`, `Diario`, `Dono`, `Historico`, `Prescricao`, `Sintoma`, `Veterinario`, `HistoricoRecomendacaoIa`), enums de status e excecoes customizadas (`DomainException`, `NotFoundException`, `BusinessRuleException`).
+- **ClyvoVetChallenge.Application:** Orquestracao de regras de negocio, DTOs de entrada e saida, parametros de busca paginada, contratos de servico (`IAnimalService`, `IConsultaService`, `IRecomendacaoIaService`, etc.) e interfaces de repositorios (`IRepository<T>`, `IAnimalRepository`, `IConsultaRepository`, `IRecomendacaoIaRepository`). Possui o metodo de extensao `AddApplicationServices()`.
+- **ClyvoVetChallenge.Infrastructure:** Implementacao de persistencia relacional via Entity Framework Core (`AppDbContext`, configuracoes Fluent API), persistencia NoSQL MongoDB (`MongoRepository<T>`, `RecomendacaoIaRepository`), servico de geracao de tokens JWT (`TokenService`) e execucao de stored procedures. Possui o metodo de extensao `AddInfrastructureServices()`.
+- **ClyvoVetChallenge.Api:** Camada de apresentacao RESTful contendo os Controllers HTTP, configuracao de middlewares (Correlation ID, Serilog, RFC 7807 ProblemDetails GlobalExceptionHandler), politicas de seguranca JWT Bearer, gerador de hipermidia HATEOAS e configuracoes do Swagger.
+
+### Persistencia Poliglota:
+- **Relacional (PostgreSQL):** Dados cadastrais e transacionais com integridade referencial estrita e transacoes ACID (Animais, Consultas, Prescricoes, Tutores).
+- **NoSQL (MongoDB):** Dados semiestruturados contendo as avaliacoes clinicas e recomendacoes de cuidado geradas pelo servico de IA, alem de logs analiticos e historico evolutivo do paciente.
+
+---
+
+## 5. Documentacao dos Endpoints (OpenAPI / Swagger)
+
+A documentacao interativa completa da API encontra-se exportada no arquivo [`docs/swagger.json`](docs/swagger.json) e pode ser acessada visualmente atraves da rota `/swagger` quando a aplicacao estiver em execucao.
+
+### Tabela Resumo dos Endpoints
+
+| Metodo | Rota | Descricao | Autenticacao |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/Auth/login` | Autenticacao do usuario com geracao do token JWT | Anonimo |
+| `POST` | `/api/Auth/registrar` | Cadastro de novo usuario no sistema | Anonimo |
+| `GET` | `/api/Auth/perfil` | Informacoes do perfil do usuario autenticado | Bearer JWT |
+| `GET` | `/api/status` | Marcador de versao e ambiente para esteira de CI/CD | Anonimo |
+| `GET` | `/health` | Diagnostico detalhado de saude e dependencias da API | Anonimo |
+| `GET` | `/health/ready` | Probe de prontidao (Readiness) para orquestradores | Anonimo |
+| `GET` | `/health/live` | Probe de vivacidade (Liveness) para orquestradores | Anonimo |
+| `GET` | `/metrics` | Metricas Prometheus exportadas via OpenTelemetry | Anonimo |
+| `GET` | `/api/Animal` | Listagem de todos os animais com links HATEOAS | Bearer JWT |
+| `GET` | `/api/Animal/paged` | Listagem paginada, filtrada e ordenada com HATEOAS | Bearer JWT |
+| `GET` | `/api/Animal/{id}` | Consulta de animal por identificador unico | Bearer JWT |
+| `POST` | `/api/Animal` | Cadastro de novo animal com validacao de data | Bearer JWT |
+| `PUT` | `/api/Animal/{id}` | Atualizacao de dados cadastrais de animal | Bearer JWT |
+| `DELETE`| `/api/Animal/{id}` | Remocao de animal do cadastro | Bearer JWT |
+| `GET` | `/api/Consulta` | Listagem de todas as consultas com HATEOAS | Bearer JWT |
+| `GET` | `/api/Consulta/paged` | Listagem paginada de consultas com HATEOAS | Bearer JWT |
+| `GET` | `/api/Consulta/{id}` | Consulta veterinaria por identificador unico | Bearer JWT |
+| `GET` | `/api/Consulta/animal/{animalId}` | Listagem de consultas vinculadas a um animal | Bearer JWT |
+| `POST` | `/api/Consulta` | Agendamento de consulta veterinaria | Bearer JWT |
+| `PUT` | `/api/Consulta/{id}/resultado` | Atualizacao do laudo, parecer e status da consulta | Bearer JWT |
+| `DELETE`| `/api/Consulta/{id}` | Cancelamento ou remocao de consulta | Bearer JWT |
+| `POST` | `/api/RecomendacaoIa/avaliar` | Avaliacao clinica por IA e persistencia no MongoDB | Bearer JWT |
+| `GET` | `/api/RecomendacaoIa/animal/{animalId}`| Historico de recomendacoes de IA por animal | Bearer JWT |
+| `GET` | `/api/RecomendacaoIa` | Historico global de analises de IA persistidas | Bearer JWT |
+| `GET` | `/api/Clinica` | Listagem de clinicas veterinarias cadastradas | Bearer JWT |
+| `GET` | `/api/Diario` | Listagem de registros do diario de saude | Bearer JWT |
+| `GET` | `/api/Dono` | Listagem de tutores de animais cadastrados | Bearer JWT |
+| `GET` | `/api/Historico` | Listagem de eventos medicos no prontuario | Bearer JWT |
+| `GET` | `/api/Prescricao` | Listagem de prescricoes de medicamentos | Bearer JWT |
+| `GET` | `/api/Sintoma` | Catalogo padronizado de sintomas veterinarios | Bearer JWT |
+| `GET` | `/api/Veterinario` | Listagem de medicos veterinarios com CRMV | Bearer JWT |
+
+---
+
+## 6. Exemplos de Payloads JSON e Hipermidia HATEOAS
+
+### Autenticacao (`POST /api/Auth/login`)
 ```json
 {
   "username": "admin",
   "password": "SuaSenhaSegura!"
 }
 ```
-
-### Cadastro de Animal (`POST /api/Animal`)
+Resposta com token e expiracao:
 ```json
 {
-  "donoId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "nome": "Rex",
-  "especie": "Canina",
-  "raca": "Labrador",
-  "sexo": "Macho",
-  "dataNascimento": "2022-05-10",
-  "peso": 25.5
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expirationMinutes": 120,
+  "expiration": "2026-10-26T14:30:00Z",
+  "usuario": "admin"
 }
 ```
 
-### Agendamento de Consulta (`POST /api/Consulta`)
+### Consulta Paginada com HATEOAS (`GET /api/Animal/paged?pageNumber=1&pageSize=2`)
 ```json
 {
-  "animalId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "veterinarioId": "4ba95f64-5717-4562-b3fc-2c963f66afa7",
-  "clinicaId": "5ca95f64-5717-4562-b3fc-2c963f66afa8",
-  "dataConsulta": "2026-08-10",
-  "horaConsulta": "14:00:00",
-  "motivo": "Vacinação anual e revisão geral",
-  "tipo": "Presencial"
-}
-```
-
-### Atualização de Resultado da Consulta (`PUT /api/Consulta/{id}/resultado`)
-```json
-{
-  "diagnostico": "Animal saudável, vacinas polivalente e antirrábica aplicadas",
-  "observacoes": "Retorno agendado para daqui a 12 meses",
-  "status": 2
-}
-```
-
----
-
-## Monitoramento e Observabilidade
-
-A API conta com recursos nativos e estruturados de observabilidade:
-
-### Endpoints de Health Check
-- `GET /health`: Executa os testes de conectividade ativos contra o banco de dados (`AddDbContextCheck<AppDbContext>`) e serviços externos. Retorna HTTP 200 (Healthy / Degraded) ou HTTP 503 (Unhealthy).
-- `GET /health/ready`: Probe de prontidão avaliando dependências essenciais marcadas com tag `ready`.
-- `GET /health/live`: Probe de vivacidade leve para orquestradores (Kubernetes e Docker).
-
-#### Exemplo de Resposta do Health Check (`/health`)
-```json
-{
-  "status": "Healthy",
-  "duration": "00:00:00.7297179",
-  "checks": [
+  "items": [
     {
-      "name": "database",
-      "status": "Healthy",
-      "description": null,
-      "duration": "00:00:00.0377955",
-      "error": null
+      "id": "7ca6469b-869d-4be9-ba4f-ee5a40b955bb",
+      "donoId": "a1f59224-cf56-4c47-b352-78a053cbe962",
+      "nome": "Pipoca",
+      "especie": "Felina",
+      "raca": "Siames",
+      "sexo": "Femea",
+      "dataNascimento": "2022-03-01",
+      "peso": 4.20,
+      "links": [
+        {
+          "href": "http://localhost:8080/api/Animal/7ca6469b-869d-4be9-ba4f-ee5a40b955bb",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "http://localhost:8080/api/Animal/7ca6469b-869d-4be9-ba4f-ee5a40b955bb",
+          "rel": "update",
+          "method": "PUT"
+        },
+        {
+          "href": "http://localhost:8080/api/Animal/7ca6469b-869d-4be9-ba4f-ee5a40b955bb",
+          "rel": "delete",
+          "method": "DELETE"
+        },
+        {
+          "href": "http://localhost:8080/api/Animal",
+          "rel": "all-animals",
+          "method": "GET"
+        }
+      ]
+    }
+  ],
+  "pageNumber": 1,
+  "pageSize": 2,
+  "totalCount": 5,
+  "totalPages": 3,
+  "hasPreviousPage": false,
+  "hasNextPage": true,
+  "links": [
+    {
+      "href": "http://localhost:8080/api/Animal/paged?pageNumber=1&pageSize=2",
+      "rel": "self",
+      "method": "GET"
     },
     {
-      "name": "fiap-portal",
-      "status": "Healthy",
-      "description": null,
-      "duration": "00:00:00.7201480",
-      "error": null
+      "href": "http://localhost:8080/api/Animal/paged?pageNumber=1&pageSize=2",
+      "rel": "first-page",
+      "method": "GET"
+    },
+    {
+      "href": "http://localhost:8080/api/Animal/paged?pageNumber=3&pageSize=2",
+      "rel": "last-page",
+      "method": "GET"
+    },
+    {
+      "href": "http://localhost:8080/api/Animal/paged?pageNumber=2&pageSize=2",
+      "rel": "next-page",
+      "method": "GET"
     }
   ]
 }
 ```
 
-### Métricas Prometheus (`/metrics`)
-O endpoint `/metrics` expõe métricas no padrão Prometheus alimentadas pelo OpenTelemetry:
-- Métricas de runtime do .NET: contadores de Garbage Collection, thread pool, consumo de memória e CPU.
-- Métricas HTTP do ASP.NET Core: duração de requisições, requisições ativas e distribuição de status HTTP.
-- Métricas de banco de dados via Entity Framework Core: comandos executados e latência de conexão.
-- Métricas de requisições de clientes externos (`HttpClient`).
+### Recomendacao de IA e NoSQL (`POST /api/RecomendacaoIa/avaliar`)
+Requisicao:
+```json
+{
+  "animalId": "7ca6469b-869d-4be9-ba4f-ee5a40b955bb",
+  "nomeAnimal": "Pipoca",
+  "especie": "Felina",
+  "idadeAnos": 2,
+  "sintomas": [
+    "tosse",
+    "dificuldade respiratoria"
+  ],
+  "observacoesAdicionais": "Apresenta cansaco facil apos brincar"
+}
+```
+Resposta estruturada persistida no MongoDB:
+```json
+{
+  "id": "671cc815d9a9f24823101e4a",
+  "animalId": "7ca6469b-869d-4be9-ba4f-ee5a40b955bb",
+  "nomeAnimal": "Pipoca",
+  "especie": "Felina",
+  "diagnosticoSugerido": "Suspeita de Complexo Respiratorio Felino / Asma Felina",
+  "nivelUrgencia": "Emergencia",
+  "recomendacoesCuidados": [
+    "Encaminhamento imediato para unidade de pronto atendimento veterinario.",
+    "Manter o paciente em repouso e evitar movimentacao brusca."
+  ],
+  "dataAvaliacao": "2026-10-26T13:25:00Z",
+  "modeloIaUtilizado": "ClyvoVet-ClinicalDecision-v2"
+}
+```
 
-### Logging Estruturado (Serilog)
-- **Console:** Formatado para inspeção em tempo real durante desenvolvimento.
-- **Rolling File:** Gravação persistente no caminho `logs/clyvovet-.log` com arquivos diários e rotação automática.
-- **Correlation ID:** O middleware `CorrelationIdMiddleware` propaga o cabeçalho `X-Correlation-Id` nas respostas e no `LogContext`.
-- **Tratamento Global de Exceções:** Centralizado via `GlobalExceptionHandler` retornando ProblemDetails padronizado (RFC 9110) com correlação do `TraceId`.
+### Marcador de Deploy para DevOps (`GET /api/status`)
+```json
+{
+  "application": "Clyvo Vet API",
+  "version": "1.0.0-sprint4",
+  "environment": "Production",
+  "status": "Online",
+  "timestamp": "2026-10-26T13:25:00Z"
+}
+```
 
 ---
 
-## Como Executar o Projeto
+## 7. Variaveis de Ambiente e Segredos
 
-### Opção 1: Execução Local com SQLite (Desenvolvimento Isolado)
-No ambiente `Development`, a API pode utilizar SQLite local com schema gerenciado em arquivo, sem dependência de banco externo.
+A aplicacao adota a politica estrita de **Zero Credenciais Expostas** em arquivos versionados. Todas as credenciais no arquivo `appsettings.json` possuem valor vazio `""` e sao injetadas em tempo de execucao.
 
-1. Restaure as dependências e compile o projeto:
+### Variaveis de Ambiente Suportadas:
+| Variavel | Descricao | Exemplo / Formato |
+| :--- | :--- | :--- |
+| `ASPNETCORE_ENVIRONMENT` | Ambiente de execucao da aplicacao | `Development` ou `Production` |
+| `PORT` | Porta HTTP da aplicacao | `8080` ou `5177` |
+| `ConnectionStrings__DefaultConnection` | String de conexao com o PostgreSQL | Montada em runtime via variaveis atomicas |
+| `MongoDbSettings__ConnectionString` | URI de conexao com o cluster MongoDB | `mongodb+srv://user:pass@cluster.mongodb.net/` |
+| `MongoDbSettings__DatabaseName` | Nome da base de dados NoSQL | `db_clyvovet_nosql` |
+| `JWT_SECRET` ou `Jwt__Key` | Chave criptografica simetrica (minimo 32 caracteres) | `chave_secreta_jwt_minimo_32_caracteres_long` |
+| `AUTH_USERNAME` | Usuario administrador para autenticacao inicial | `admin` |
+| `AUTH_PASSWORD` | Senha administrativa protegida | `<senha_gerada_em_segredo>` |
+| `KEY_VAULT_NAME` | Nome do cofre Azure Key Vault para resolucao | `kv-bytecare-564361` |
+
+### Configuracao Local via Dotnet User-Secrets:
 ```bash
-dotnet build
+dotnet user-secrets init --project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj
+dotnet user-secrets set "Jwt:Key" "chave_jwt_para_desenvolvimento_local_32_chars!" --project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj
+dotnet user-secrets set "Auth:Password" "SenhaDev123!" --project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj
 ```
 
-2. Defina uma chave JWT para a sessão e inicie a API:
+---
+
+## 8. Instrucoes de Instalacao, Execucao e Testes
+
+### 1. Restaurar Pacotes e Dependencias
 ```bash
-export JWT_SECRET="sua_chave_jwt_para_desenvolvimento_local_32_chars!"
+dotnet restore
+```
+
+### 2. Compilar a Solucao
+```bash
+dotnet build --configuration Release
+```
+
+### 3. Aplicar Migrations no Banco de Dados Relacional
+Para PostgreSQL em ambiente local ou na nuvem:
+```bash
+dotnet ef database update --project ClyvoVetChallenge.Infrastructure/ClyvoVetChallenge.Infrastructure.csproj --startup-project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj
+```
+*(Nota: O script completo DDL com carga inicial e Stored Procedures encontra-se no arquivo `script_bd.sql` na raiz).*
+
+### 4. Executar a Aplicacao Localmente
+```bash
+export JWT_SECRET="chave_jwt_para_desenvolvimento_local_32_chars!"
 dotnet run --project ClyvoVetChallenge.Api/ClyvoVetChallenge.Api.csproj --launch-profile http
 ```
 
-3. Acesse os serviços:
-- **Swagger UI:** [http://localhost:5177/swagger](http://localhost:5177/swagger)
-- **Health Check:** [http://localhost:5177/health](http://localhost:5177/health)
-- **Métricas:** [http://localhost:5177/metrics](http://localhost:5177/metrics)
-
----
-
-### Opção 2: Execução com PostgreSQL via Docker Compose
-Para executar a aplicação localmente integrada ao banco relacional PostgreSQL 16 containerizado:
-
-1. Configure as variáveis de ambiente necessárias a partir do arquivo `.env.example`:
+### 5. Executar Toda a Suite de Testes Automatizados
 ```bash
-cp .env.example .env
-```
-2. Defina `POSTGRES_PASSWORD` e `JWT_SECRET` no arquivo `.env`.
-
-3. Inicie a stack:
-```bash
-docker compose up --build
-```
-A API ficará acessível na porta `8080`: [http://localhost:8080/swagger](http://localhost:8080/swagger).
-
----
-
-## Guia de Execução de Testes
-
-O projeto conta com suíte automatizada de testes seguindo o padrão AAA (Arrange, Act, Assert) e convenções estritas de engenharia de software:
-
-### Estrutura dos Projetos de Teste
-- `ClyvoVetChallenge.Tests.Unit`: 92 testes unitários cobrindo todas as entidades do domínio e serviços de aplicação, com isolamento de dependências via **Moq**.
-- `ClyvoVetChallenge.Tests.Integration`: 31 testes de integração cobrindo o ciclo HTTP completo com `WebApplicationFactory<Program>`, validação de inicialização e persistência isolada.
-
-### Comandos de Teste
-
-Executar toda a suíte de testes (123 testes automatizados):
-```bash
-dotnet test
-```
-
-Executar apenas os testes unitários:
-```bash
-dotnet test ClyvoVetChallenge.Tests.Unit/ClyvoVetChallenge.Tests.Unit.csproj
-```
-
-Executar apenas os testes de integração:
-```bash
-dotnet test ClyvoVetChallenge.Tests.Integration/ClyvoVetChallenge.Tests.Integration.csproj
-```
-
-Executar com saída detalhada:
-```bash
-dotnet test --logger "console;verbosity=detailed"
+dotnet test --configuration Release
 ```
 
 ---
 
-## Infraestrutura & Deploy em Nuvem (DevOps & Cloud Computing)
+## 9. Guia de Deploy e Monitoramento em Nuvem
 
-### Arquitetura da Solução em Nuvem (Opção 1: ACR + ACI)
-
-![Arquitetura Azure](docs/architecture/azure_architecture.png)
-
-#### Topologia e Componentes Homologados:
-1. **Computação da Aplicação (ACI):** Container `aci-api-bytecare` executando a API .NET 9.0 em Azure Container Instances (ACI), em ambiente Linux sob usuário restrito não-root (`USER app`, `uid=1654`, `gid=1654`) na porta `8080`.
-2. **Banco de Dados Relacional (ACI):** Container `aci-db-bytecare` executando PostgreSQL 16 Alpine em Azure Container Instances (ACI), com porta `5432` exposta na rede virtual da nuvem.
-3. **Registro de Contêineres (ACR):** Azure Container Registry (`acrbytecare.azurecr.io`) provisionado para hospedar as imagens imutáveis: `api-bytecare:v1` e `postgres-bytecare:v1`.
-4. **Gerenciamento de Segredos e Conformidade (Azure Key Vault):** Integração com o **Azure Key Vault** (`kv-bytecare-564361`) para armazenamento e resolução segura de credenciais e chaves criptográficas (`Jwt--Key`, `ConnectionStrings--DefaultConnection`, `Auth--Password`).
-5. **Injeção Segura de Parâmetros:** No provisionamento via Azure CLI, senhas e chaves criptográficas são repassadas via parâmetro `--secure-environment-variables` nos containers ACI, eliminando a exposição em texto claro em logs ou inspeções.
-6. **Assinatura Azure Mandatória:** Contexto configurado na assinatura `2026-2TDSPJ-JOAO-H-BATISTA-LEAL-RM564361`, sob o Resource Group `rg-bytecare` na região `brazilsouth`.
-
-> [!NOTE]
-> O arquivo `script_bd.sql` na raiz do repositório contém o script DDL completo em PostgreSQL com comentários estruturais nas tabelas e carga inicial de dados para a disciplina de DevOps & Cloud Computing.
-
-### Deploy Automatizado na Nuvem Azure
-O provisionamento completo da infraestrutura e deploy dos containers é automatizado via script `deploy.sh`:
-
+### Deploy Automatizado via Azure CLI
+O script `deploy.sh` provisiona os recursos na regiao `brazilsouth` sob a assinatura academica oficial:
 ```bash
-# 1. Definir o contexto da assinatura obrigatória
 az account set --subscription "2026-2TDSPJ-JOAO-H-BATISTA-LEAL-RM564361"
-
-# 2. Exportar credenciais obrigatórias para a sessão
-export DB_PASSWORD="<sua_senha_forte_do_postgres>"
-export JWT_SECRET="<sua_chave_jwt_secreta_com_minimo_32_caracteres>"
-
-# 3. Executar o provisionamento e deploy
+read -s -p "Digite a senha do PostgreSQL: " DB_PASSWORD; echo
+export DB_PASSWORD
+read -s -p "Digite o JWT Secret: " JWT_SECRET; echo
+export JWT_SECRET
 chmod +x deploy.sh
 ./deploy.sh
 ```
 
-O script automatiza o fluxo:
-- Criação do Resource Group `rg-bytecare` na região `brazilsouth`.
-- Provisionamento do Azure Key Vault `kv-bytecare-564361` e cadastro seguro dos segredos.
-- Provisionamento do Azure Container Registry `acrbytecare`.
-- Build da imagem da API (`api-bytecare:v1`) e importação do PostgreSQL 16 (`postgres-bytecare:v1`).
-- Criação dos containers ACI `aci-db-bytecare` e `aci-api-bytecare` com injeção segura de variáveis via `--secure-environment-variables`.
-- Verificação de conectividade e validação da integridade via endpoint `/health`.
+### Monitoramento de Saude (Health Checks)
+A API fornece tres niveis de verificacao automatizada:
+- `/health`: Analisa a saude completa, executando `SELECT 1` no banco de dados e verificando integridade de servicos externos.
+- `/health/ready`: Probe de prontidao para orquestradores de container.
+- `/health/live`: Probe leve de vivacidade do processo HTTP.
 
-### Execução com Usuário Não-Root
-O `Dockerfile` da aplicação define a execução sob usuário restrito sem privilégios de root:
-```dockerfile
-USER app
-```
-Comprovação no contêiner ativo:
-```bash
-az container exec --resource-group rg-bytecare --name aci-api-bytecare --exec-command "id"
-# uid=1654(app) gid=1654(app) groups=1654(app)
-```
-
-### Evidência das Operações de CRUD no Banco de Dados
-Abaixo estão os exemplos das operações de CRUD executadas via HTTP contra a API e validadas no banco de dados relacional PostgreSQL:
-
-#### 1. Inserção (POST /api/Dono)
-```bash
-curl -X POST "http://api-bytecare.brazilsouth.azurecontainer.io:8080/api/Dono" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Gabriel Siqueira",
-    "cpf": "987.654.321-99",
-    "email": "gabriel.siqueira@bytecare.com",
-    "telefone": "(11) 91234-5678",
-    "dataNascimento": "1995-08-20",
-    "endereco": "Rua Vergueiro, 1000 - SP"
-  }'
-```
-Persistência validada na tabela `TB_DONO` via SQL (`SELECT * FROM "TB_DONO" WHERE "Cpf" = '987.654.321-99';`).
-
-#### 2. Consulta (GET /api/Dono/{id})
-```bash
-curl -X GET "http://api-bytecare.brazilsouth.azurecontainer.io:8080/api/Dono/{id}"
-```
-Retorna os dados cadastrados com status HTTP 200 OK.
-
-#### 3. Atualização (PUT /api/Dono/{id})
-```bash
-curl -X PUT "http://api-bytecare.brazilsouth.azurecontainer.io:8080/api/Dono/{id}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nome": "Gabriel Siqueira Silva",
-    "cpf": "987.654.321-99",
-    "email": "gabriel.silva@bytecare.com",
-    "telefone": "(11) 99999-0000",
-    "dataNascimento": "1995-08-20",
-    "endereco": "Av. Paulista, 2000 - Apto 101, SP"
-  }'
-```
-Retorna os dados atualizados com status HTTP 200 OK.
-
-#### 4. Exclusão (DELETE /api/Dono/{id})
-```bash
-curl -X DELETE "http://api-bytecare.brazilsouth.azurecontainer.io:8080/api/Dono/{id}"
-```
-Retorna status HTTP 204 No Content. Registros dependentes têm integridade referencial protegida por chaves estrangeiras.
-
-#### 5. Diagnóstico de Saúde (/health)
-```bash
-curl -s http://api-bytecare.brazilsouth.azurecontainer.io:8080/health
-```
-Retorna diagnóstico em JSON confirmando status `Healthy` para o banco de dados e dependências externas.
-
-### Descomissionamento dos Recursos
-Para desalocar os recursos em nuvem após a conclusão das avaliações:
-```bash
-az group delete --name rg-bytecare --yes --no-wait
-```
+### Roteiro para a Gravacao do Video de DevOps (Demonstracao Pratica):
+1. **Pipeline de CI/CD no Azure DevOps:** Exiba a organizacao do Azure DevOps, o projeto com visibilidade privada e o professor como Project Administrator.
+2. **Gatilho Automatico:** Altere a string de versao no arquivo `StatusController.cs` (ex: de `"1.0.0-sprint4"` para `"1.0.1-sprint4"`), faca o commit e push na branch `main`/`master`.
+3. **Execucao da Pipeline:** Demonstre a pipeline disparando automaticamente, executando os 138 testes com aprovacao total e publicando o artefato `drop`.
+4. **Validacao em Producao:** Acesse a URL pública no Azure (`http://<fqdn>:8080/api/status` e `/swagger`) e mostre a nova versao no ar.
+5. **Operacao de CRUD com SELECT em Nuvem:** Realize a insercao de um tutor via Swagger (`POST /api/Dono`) e comprove a persistencia direta na tabela `TB_DONO` atraves de um comando `SELECT` executado no banco em nuvem.
