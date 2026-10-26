@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class RecomendacaoIaController(IRecomendacaoIaService recomendacaoIaService) : ControllerBase
@@ -50,3 +53,4 @@ public class RecomendacaoIaController(IRecomendacaoIaService recomendacaoIaServi
         return Ok(response);
     }
 }
+

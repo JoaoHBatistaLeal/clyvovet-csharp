@@ -1,21 +1,21 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
+using ClyvoVetChallenge.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController(IConfiguration configuration) : ControllerBase
+public class AuthController(IConfiguration configuration, ITokenService tokenService) : ControllerBase
 {
     /// <summary>
-    /// Realiza a autenticacao do usuario e gera o token JWT.
-    /// As credenciais sao validadas estritamente contra o Azure Key Vault ou variaveis seguras de ambiente.
+    /// Realiza a autenticacao do usuario e gera o token JWT com claims e tempo de expiracao.
     /// </summary>
+    /// <param name="request">Credenciais de usuario e senha</param>
+    /// <returns>Token JWT e tempo de expiracao</returns>
+    [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,41 +67,50 @@ public class AuthController(IConfiguration configuration) : ControllerBase
             });
         }
 
-        var jwtKey = configuration["Jwt:Key"]
-            ?? configuration["Jwt--Key"]
-            ?? configuration["JWT_SECRET"]
-            ?? configuration["JwtSecret"]
-            ?? configuration["JWT_KEY"]
-            ?? Environment.GetEnvironmentVariable("JWT_SECRET")
-            ?? Environment.GetEnvironmentVariable("JWT_KEY");
+        var token = tokenService.GenerateToken(request.Username, "Admin");
 
-        if (string.IsNullOrWhiteSpace(jwtKey))
+        return Ok(new
         {
-            throw new InvalidOperationException("Chave secreta JWT nao configurada no Azure Key Vault ou ambiente.");
+            token,
+            expirationMinutes = tokenService.ExpirationMinutes,
+            expiration = DateTime.UtcNow.AddMinutes(tokenService.ExpirationMinutes),
+            usuario = request.Username
+        });
+    }
+
+    /// <summary>
+    /// Registra um novo usuario para acesso a API.
+    /// </summary>
+    /// <param name="request">Dados de cadastro do novo usuario</param>
+    /// <returns>Confirmacao de registro do usuario</returns>
+    [AllowAnonymous]
+    [HttpPost("registrar")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public IActionResult Registrar([FromBody] RegisterRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Type = "about:blank",
+                Title = "Requisicao invalida",
+                Status = StatusCodes.Status400BadRequest,
+                Detail = "Usuario e senha sao obrigatorios."
+            });
         }
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(jwtKey);
-        var tokenDescriptor = new SecurityTokenDescriptor
+        return StatusCode(StatusCodes.Status201Created, new
         {
-            Subject = new ClaimsIdentity(
-            [
-                new Claim(ClaimTypes.Name, request.Username),
-                new Claim(ClaimTypes.Role, "Admin")
-            ]),
-            Expires = DateTime.UtcNow.AddHours(2),
-            Issuer = configuration["Jwt:Issuer"] ?? "ByteCareApi",
-            Audience = configuration["Jwt:Audience"] ?? "ByteCareClient",
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-        };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        return Ok(new { token = tokenHandler.WriteToken(token) });
+            mensagem = "Usuario registrado com sucesso.",
+            usuario = request.Username
+        });
     }
 
     /// <summary>
     /// Obtem informacoes do perfil autenticado.
     /// </summary>
+    /// <returns>Dados do usuario autenticado e status</returns>
     [Authorize]
     [HttpGet("perfil")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -117,3 +126,4 @@ public class AuthController(IConfiguration configuration) : ControllerBase
 }
 
 public record LoginRequest(string Username, string Password);
+public record RegisterRequest([Required] string Username, [Required] string Password, string? Email = null);

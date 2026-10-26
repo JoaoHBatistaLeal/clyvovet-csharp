@@ -12,7 +12,7 @@ public class AnimalApiTests
 
     public AnimalApiTests(ClyvoVetWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateAuthenticatedClient();
     }
 
     private async Task<Guid> CriarDonoValidoAsync()
@@ -218,3 +218,4 @@ public class AnimalApiTests
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 }
+

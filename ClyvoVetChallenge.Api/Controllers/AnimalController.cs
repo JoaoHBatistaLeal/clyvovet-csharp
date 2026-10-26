@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
@@ -118,3 +121,4 @@ public class AnimalController(IAnimalService animalService, IDonoService donoSer
         return deleted ? NoContent() : NotFound();
     }
 }
+

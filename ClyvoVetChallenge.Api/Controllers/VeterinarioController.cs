@@ -1,16 +1,19 @@
-Ôªøusing Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
 public class VeterinarioController(IVeterinarioService veterinarioService) : ControllerBase
 {
     /// <summary>
-    /// Lista todos os veterin√°rios cadastrados.
+    /// Lista todos os veterin·rios cadastrados.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -20,7 +23,7 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
     }
 
     /// <summary>
-    /// Busca um veterin√°rio espec√≠fico pelo seu identificador √∫nico.
+    /// Busca um veterin·rio especÌfico pelo seu identificador ˙nico.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +35,7 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
     }
 
     /// <summary>
-    /// Registra um novo veterin√°rio no sistema.
+    /// Registra um novo veterin·rio no sistema.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -44,7 +47,7 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
     }
 
     /// <summary>
-    /// Atualiza as informa√ß√µes de um veterin√°rio existente.
+    /// Atualiza as informaÁıes de um veterin·rio existente.
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -56,7 +59,7 @@ public class VeterinarioController(IVeterinarioService veterinarioService) : Con
     }
 
     /// <summary>
-    /// Remove um veterin√°rio do sistema.
+    /// Remove um veterin·rio do sistema.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -1,16 +1,19 @@
-Ôªøusing Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
 public class DiarioController(IDiarioService diarioService) : ControllerBase
 {
     /// <summary>
-    /// Lista todas as entradas de di√°rio cadastradas.
+    /// Lista todas as entradas de di·rio cadastradas.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -20,7 +23,7 @@ public class DiarioController(IDiarioService diarioService) : ControllerBase
     }
 
     /// <summary>
-    /// Busca uma entrada de di√°rio espec√≠fica pelo seu identificador √∫nico.
+    /// Busca uma entrada de di·rio especÌfica pelo seu identificador ˙nico.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +35,7 @@ public class DiarioController(IDiarioService diarioService) : ControllerBase
     }
 
     /// <summary>
-    /// Registra uma nova entrada de di√°rio no sistema.
+    /// Registra uma nova entrada de di·rio no sistema.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -44,7 +47,7 @@ public class DiarioController(IDiarioService diarioService) : ControllerBase
     }
 
     /// <summary>
-    /// Atualiza uma entrada de di√°rio existente.
+    /// Atualiza uma entrada de di·rio existente.
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -56,7 +59,7 @@ public class DiarioController(IDiarioService diarioService) : ControllerBase
     }
 
     /// <summary>
-    /// Remove uma entrada de di√°rio do sistema.
+    /// Remove uma entrada de di·rio do sistema.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

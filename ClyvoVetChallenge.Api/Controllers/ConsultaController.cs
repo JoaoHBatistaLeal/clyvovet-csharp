@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
@@ -109,3 +112,4 @@ public class ConsultaController(IConsultaService consultaService) : ControllerBa
         return deleted ? NoContent() : NotFound();
     }
 }
+

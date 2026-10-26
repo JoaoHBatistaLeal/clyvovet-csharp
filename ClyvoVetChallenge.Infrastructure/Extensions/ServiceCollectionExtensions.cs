@@ -1,8 +1,11 @@
+using ClyvoVetChallenge.Application.Configurations;
 using ClyvoVetChallenge.Application.Interfaces.Repositories;
+using ClyvoVetChallenge.Application.Services.Interfaces;
 using ClyvoVetChallenge.Infrastructure.Mongo;
 using ClyvoVetChallenge.Infrastructure.Mongo.Repositories;
 using ClyvoVetChallenge.Infrastructure.Persistence;
 using ClyvoVetChallenge.Infrastructure.Repositories;
+using ClyvoVetChallenge.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +41,9 @@ public static class ServiceCollectionExtensions
         services.Configure<MongoDbSettings>(configuration.GetSection(MongoDbSettings.SectionName));
         services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
         services.AddScoped<IRecomendacaoIaRepository, RecomendacaoIaRepository>();
+
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddScoped<ITokenService, TokenService>();
 
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IAnimalRepository, AnimalRepository>();

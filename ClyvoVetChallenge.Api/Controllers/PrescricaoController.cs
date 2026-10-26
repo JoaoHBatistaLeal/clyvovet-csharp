@@ -1,16 +1,19 @@
-ï»¿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
 public class PrescricaoController(IPrescricaoService prescricaoService) : ControllerBase
 {
     /// <summary>
-    /// Lista todas as prescriÃ§Ãµes cadastradas.
+    /// Lista todas as prescrições cadastradas.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -20,7 +23,7 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
     }
 
     /// <summary>
-    /// Busca uma prescriÃ§Ã£o especÃ­fica pelo seu identificador Ãºnico.
+    /// Busca uma prescrição específica pelo seu identificador único.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +35,7 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
     }
 
     /// <summary>
-    /// Registra uma nova prescriÃ§Ã£o no sistema.
+    /// Registra uma nova prescrição no sistema.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -44,7 +47,7 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
     }
 
     /// <summary>
-    /// Atualiza uma prescriÃ§Ã£o existente.
+    /// Atualiza uma prescrição existente.
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -56,7 +59,7 @@ public class PrescricaoController(IPrescricaoService prescricaoService) : Contro
     }
 
     /// <summary>
-    /// Remove uma prescriÃ§Ã£o do sistema.
+    /// Remove uma prescrição do sistema.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

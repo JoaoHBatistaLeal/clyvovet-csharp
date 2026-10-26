@@ -1,9 +1,12 @@
-ï»¿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
@@ -20,7 +23,7 @@ public class DonoController(IDonoService donoService) : ControllerBase
     }
 
     /// <summary>
-    /// Busca um dono especÃ­fico pelo seu identificador Ãºnico.
+    /// Busca um dono específico pelo seu identificador único.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -44,7 +47,7 @@ public class DonoController(IDonoService donoService) : ControllerBase
     }
 
     /// <summary>
-    /// Atualiza as informaÃ§Ãµes de um dono existente.
+    /// Atualiza as informações de um dono existente.
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]

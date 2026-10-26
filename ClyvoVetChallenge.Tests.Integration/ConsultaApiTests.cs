@@ -13,7 +13,7 @@ public class ConsultaApiTests
 
     public ConsultaApiTests(ClyvoVetWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateAuthenticatedClient();
     }
 
     private async Task<(Guid AnimalId, Guid VetId, Guid ClinicaId)> CriarDependenciasValidasAsync()
@@ -169,3 +169,4 @@ public class ConsultaApiTests
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 }
+

@@ -1,16 +1,19 @@
-ï»¿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
 public class ClinicaController(IClinicaService clinicaService) : ControllerBase
 {
     /// <summary>
-    /// Lista todas as clÃ­nicas cadastradas.
+    /// Lista todas as clínicas cadastradas.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -20,7 +23,7 @@ public class ClinicaController(IClinicaService clinicaService) : ControllerBase
     }
 
     /// <summary>
-    /// Busca uma clÃ­nica especÃ­fica pelo seu identificador Ãºnico.
+    /// Busca uma clínica específica pelo seu identificador único.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +35,7 @@ public class ClinicaController(IClinicaService clinicaService) : ControllerBase
     }
 
     /// <summary>
-    /// Registra uma nova clÃ­nica no sistema.
+    /// Registra uma nova clínica no sistema.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -44,7 +47,7 @@ public class ClinicaController(IClinicaService clinicaService) : ControllerBase
     }
 
     /// <summary>
-    /// Atualiza as informaÃ§Ãµes de uma clÃ­nica existente.
+    /// Atualiza as informações de uma clínica existente.
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -56,7 +59,7 @@ public class ClinicaController(IClinicaService clinicaService) : ControllerBase
     }
 
     /// <summary>
-    /// Remove uma clÃ­nica do sistema.
+    /// Remove uma clínica do sistema.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

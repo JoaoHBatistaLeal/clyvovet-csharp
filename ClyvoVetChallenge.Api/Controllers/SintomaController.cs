@@ -1,9 +1,12 @@
-ï»¿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
@@ -20,7 +23,7 @@ public class SintomaController(ISintomaService sintomaService) : ControllerBase
     }
 
     /// <summary>
-    /// Busca um sintoma especÃ­fico pelo seu identificador Ãºnico.
+    /// Busca um sintoma específico pelo seu identificador único.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]

@@ -12,7 +12,7 @@ public class ClinicaApiTests
 
     public ClinicaApiTests(ClyvoVetWebApplicationFactory factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.CreateAuthenticatedClient();
     }
 
     [Fact]
@@ -86,3 +86,4 @@ public class ClinicaApiTests
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 }
+

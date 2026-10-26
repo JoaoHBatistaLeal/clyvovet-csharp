@@ -1,8 +1,13 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using ClyvoVetChallenge.Infrastructure.Persistence;
 
 namespace ClyvoVetChallenge.Tests.Integration.Fixtures;
@@ -31,6 +36,35 @@ public class ClyvoVetWebApplicationFactory : WebApplicationFactory<Program>
     public ClyvoVetWebApplicationFactory()
     {
         EnsureTestEnvironment(_dbFile);
+    }
+
+    public static string GenerateTestToken(string username = TestUsername, string role = "Admin")
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(TestJwtKey);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(
+            [
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role)
+            ]),
+            Expires = DateTime.UtcNow.AddHours(2),
+            Issuer = "ByteCareApi",
+            Audience = "ByteCareClient",
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+    public HttpClient CreateAuthenticatedClient(string username = TestUsername, string role = "Admin")
+    {
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", GenerateTestToken(username, role));
+        return client;
     }
 
     protected override void ConfigureClient(HttpClient client)

@@ -1,16 +1,19 @@
-锘縰sing Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using ClyvoVetChallenge.Application.DTOs;
 using ClyvoVetChallenge.Application.Services.Interfaces;
 
 namespace ClyvoVetChallenge.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
+[Authorize]
 [Produces("application/json")]
 [Route("api/[controller]")]
 [ApiController]
 public class HistoricoController(IHistoricoService historicoService) : ControllerBase
 {
     /// <summary>
-    /// Lista todos os hist贸ricos cadastrados.
+    /// Lista todos os hist髍icos cadastrados.
     /// </summary>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -20,7 +23,7 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
     }
 
     /// <summary>
-    /// Busca um hist贸rico espec铆fico pelo seu identificador 煤nico.
+    /// Busca um hist髍ico espec韋ico pelo seu identificador 鷑ico.
     /// </summary>
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +35,7 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
     }
 
     /// <summary>
-    /// Registra um novo hist贸rico no sistema.
+    /// Registra um novo hist髍ico no sistema.
     /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -44,7 +47,7 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
     }
 
     /// <summary>
-    /// Atualiza um hist贸rico existente.
+    /// Atualiza um hist髍ico existente.
     /// </summary>
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -56,7 +59,7 @@ public class HistoricoController(IHistoricoService historicoService) : Controlle
     }
 
     /// <summary>
-    /// Remove um hist贸rico do sistema.
+    /// Remove um hist髍ico do sistema.
     /// </summary>
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
